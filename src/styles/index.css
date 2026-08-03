@@ -1,0 +1,66 @@
+/* Tailwind directives are expanded by PostCSS/Tailwind rather than native CSS. */
+/* stylelint-disable at-rule-no-unknown */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@property --survey-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; font-size: 14px; }
+  body { margin: 0; min-width: 320px; min-height: 100vh; }
+  body { @apply bg-surface text-ink transition-colors duration-200; }
+  button, select, input { font: inherit; }
+}
+
+@layer components {
+  .section-label { @apply text-xs uppercase text-muted; }
+  .field-label { @apply mb-1 text-xs uppercase tracking-wide text-muted; }
+  .profile-button { @apply flex items-center gap-1.5 rounded border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50; }
+  .survey-donut { background: conic-gradient(#10b981 0 var(--survey-angle), #e2e8f0 var(--survey-angle) 360deg); transition: --survey-angle 550ms cubic-bezier(.22, 1, .36, 1); }
+  .survey-details { animation: survey-details-in 300ms cubic-bezier(.22, 1, .36, 1); }
+  .progress-bar-fill { transition: width 550ms cubic-bezier(.22, 1, .36, 1), background-color 300ms ease; }
+  .performance-details { animation: performance-details-in 300ms cubic-bezier(.22, 1, .36, 1); }
+}
+
+@layer utilities {
+  .dark body, .dark .bg-surface { background-color: #0b1120; color: #e5e7eb; }
+  .dark .bg-white { background-color: #111827; }
+  .dark .bg-slate-50 { background-color: #172033; }
+  .dark .bg-slate-100 { background-color: #1e293b; }
+  .dark .text-ink, .dark .text-slate-900, .dark .text-slate-800, .dark .text-slate-700 { color: #e5e7eb; }
+  .dark .text-slate-600, .dark .text-slate-500 { color: #94a3b8; }
+  .dark .border-slate-50, .dark .border-slate-100, .dark .border-slate-200, .dark .border-slate-300 { border-color: #334155; }
+  .dark .hover\:bg-slate-50:hover, .dark .hover\:bg-slate-100:hover { background-color: #1e293b; }
+  .dark .hover\:text-slate-900:hover { color: #f8fafc; }
+  .dark input, .dark select, .dark textarea { color: #e5e7eb; background-color: #111827; }
+  .dark input::placeholder, .dark textarea::placeholder { color: #64748b; }
+  .dark .shadow-card { box-shadow: 0 1px 3px rgba(0, 0, 0, .35); }
+  .dark .survey-donut { background: conic-gradient(#34d399 0 var(--survey-angle), #334155 var(--survey-angle) 360deg); }
+}
+
+@keyframes survey-details-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes performance-details-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .survey-donut { transition: none; }
+  .survey-details { animation: none; }
+  .progress-bar-fill { transition: none; }
+  .performance-details { animation: none; }
+}
+
+@media (max-width: 720px) {
+  main { margin-left: 4rem !important; padding-left: 1.125rem !important; padding-right: 1.125rem !important; }
+}
