@@ -1,20 +1,39 @@
 # TAMS Dashboard
 
-TAMS is a responsive React dashboard prototype for managing teaching assistants and supervisor workflows. It includes a supervisor dashboard, TA directory and profiles, theme controls, and a semester-aware weekly task schedule.
+TAMS is a responsive React dashboard prototype for managing teaching assistants and supervisor workflows. It includes a supervisor dashboard, TA directory, individual profiles, semester-aware task scheduling, and Workday-based performance analytics.
 
 ## Features
 
-- Supervisor dashboard with performance, survey, hours, and action summaries
-- TA directory and individual profile views
+### Supervisor Dashboard
+
+- Performance, survey, hours, and action summaries
 - Weekly task schedule calculated from a configurable semester start date
-- Support for `T-2`, `T-1`, and semester Weeks 1–14
-- Role-based task filtering for supervisors
-- Week previews with current, completed, and future states
+- Support for `T-2`, `T-1`, and semester Weeks 1-14
+- Role-based supervisor task filtering
+- Current, completed, future, and previewed week states
 - Per-supervisor, semester, week, and task completion persistence
 - Live weekly progress calculations
+
+### TA Profiles
+
+- General information and onboarding views
+- Course assignment and workload allocation details
+- Weekly Workday performance based on one combined record per week
+- Worked versus expected hours and utilization progress
+- Status classifications: On Track, Below Hours, Over Hours, and Needs Review
+- Attendance and manual-entry indicators
+- Interactive semester hours trend chart
+- Synchronized week selection across performance details, chart highlighting, and notes
+- Newest-first supervisor notes with keyboard submission
+- Student-support performance placeholder for future metrics
+
+### Interface
+
+- Responsive desktop, tablet, and mobile layouts
 - Light and dark themes
-- Collapsible responsive navigation
-- Accessible controls and reduced-motion support
+- Collapsible navigation
+- Keyboard-accessible controls
+- Reduced-motion support
 
 ## Technology
 
@@ -53,7 +72,7 @@ Changes under `src/` are reflected automatically through Vite hot-module replace
 
 ## Validation
 
-Run the automated tests:
+Run all automated tests:
 
 ```bash
 npm test
@@ -92,18 +111,18 @@ npm run preview
 
 ```text
 src/
-├── components/
-│   ├── dashboard/        # Dashboard cards and weekly schedule components
-│   ├── layout/           # Sidebar and top navigation
-│   ├── profile/          # TA profile tabs and metrics
-│   └── ui/               # Shared card and progress components
-├── data/                 # Dashboard, profile, and weekly schedule data
-├── pages/                # Dashboard, directory, and profile views
-├── styles/               # Global and Tailwind styles
-├── utils/                # Semester calculations and persistence helpers
-├── App.jsx               # Application shell and view state
-└── main.jsx              # React entry point
-tests/                    # Unit and persistence tests
+|-- components/
+|   |-- dashboard/       # Dashboard and weekly schedule components
+|   |-- layout/          # Sidebar and top navigation
+|   |-- profile/         # Profile tabs, Workday cards, chart, and notes
+|   `-- ui/              # Shared cards and progress components
+|-- data/                # Dashboard, profile, and schedule data
+|-- pages/               # Dashboard, directory, and profile views
+|-- styles/              # Global and Tailwind styles
+|-- utils/               # Calculations, statuses, and persistence helpers
+|-- App.jsx              # Application shell and view state
+`-- main.jsx             # React entry point
+tests/                   # Schedule and performance metric tests
 ```
 
 ## Weekly Schedule Configuration
@@ -118,13 +137,55 @@ Update the configured semester start date and structured task data there when pr
 
 Task completion currently uses a local-storage adapter in `src/utils/weeklyTaskStorage.js`. Completion keys are scoped by supervisor, semester, and week so one user's progress does not overwrite another's.
 
+## Performance Data Model
+
+Course allocation and Workday reporting are intentionally separate:
+
+```js
+assignments: [
+  { course: 'ENG 101', section: '03', maxHours: 10 }
+]
+
+workdayData: [
+  {
+    week: 1,
+    expectedHours: 20,
+    workedHours: 18.4,
+    daysUnder25Minutes: 0,
+    manualEntryPercentage: 18,
+    syncedAt: '2026-06-03T17:00:00.000Z'
+  }
+]
+```
+
+Only maximum assigned hours belong to individual courses. Worked hours, attendance details, manual entries, and status are calculated from one combined Workday record for each week.
+
+Performance calculations and thresholds are centralized in:
+
+```text
+src/utils/profileMetrics.js
+```
+
+The interactive trend chart is implemented with accessible SVG and does not require a charting dependency.
+
+## Tests
+
+The test suite covers:
+
+- Semester week calculations and boundaries
+- Weekly task filtering and progress
+- Completion persistence scope
+- Workday status classification
+- Manual-entry severity thresholds
+- Aggregate Workday performance calculations
+- Missing Workday data handling
+
 ## Data and Prototype Limitations
 
-This repository is a frontend dashboard prototype. Profile and dashboard records are local structured data, and task completion is stored in the current browser rather than a production database. Clearing browser site data removes saved task completion and theme preferences.
+This repository is a frontend dashboard prototype. Profile, dashboard, and Workday records are generated local data. Weekly task completion and theme preferences use browser storage.
 
-Before production use, replace the local persistence adapter with authenticated backend endpoints that verify supervisor access.
+New supervisor notes currently remain in component state and do not persist after a full reload. Before production use, connect profiles, Workday records, notes, and task completion to authenticated backend endpoints with role-based authorization.
 
 ## Browser Support
 
 Use a current version of Chrome, Edge, Firefox, or Safari. The interface is designed for desktop, tablet, and mobile viewport sizes.
-
