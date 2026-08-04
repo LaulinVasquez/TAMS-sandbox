@@ -23,16 +23,23 @@ function seededRandom(seed) {
 function buildProfile(person, index) {
   const random = seededRandom(1049 + index * 317)
   const assignments = [0, 1].map(offset => {
-    const [course, instructor] = courses[(index + offset) % courses.length]
-    return { course, instructor, status: offset === 0 ? person.level : `Level ${1 + Math.floor(random() * 3)}`, maxHours: 10 }
+    const [courseLabel, instructor] = courses[(index + offset) % courses.length]
+    const parts = courseLabel.split(' ')
+    const section = parts.pop()
+    return { course: parts.join(' '), section, instructor, status: offset === 0 ? person.level : `Level ${1 + Math.floor(random() * 3)}`, maxHours: 10 }
   })
-  const weeklyData = Array.from({ length: 14 }, (_, weekIndex) => ({
-    week: weekIndex + 1,
-    courses: assignments.map(assignment => {
-      const worked = Number((4.5 + random() * 6.2).toFixed(2))
-      return { course: assignment.course, maxHours: assignment.maxHours, worked, daysUnder25: random() > .7 ? -Math.ceil(random() * 3) : 0, manualEntries: Math.round(random() * 62) }
-    }),
-  }))
+  const expectedHours = assignments.reduce((sum, assignment) => sum + assignment.maxHours, 0)
+  const workdayData = Array.from({ length: 14 }, (_, weekIndex) => {
+    const workedHours = Number((expectedHours - 3.5 + random() * 6).toFixed(2))
+    return {
+      week: weekIndex + 1,
+      expectedHours,
+      workedHours,
+      daysUnder25Minutes: random() > .72 ? Math.ceil(random() * 3) : 0,
+      manualEntryPercentage: Math.round(random() * 55),
+      syncedAt: `2026-${String(6 + Math.floor(weekIndex / 4)).padStart(2, '0')}-${String(3 + (weekIndex % 4) * 7).padStart(2, '0')}T17:00:00.000Z`,
+    }
+  })
   const onboardingLabels = ['Background Check', 'I-9 Verification', 'Direct Deposit Setup', 'Training Modules', 'Department Orientation']
   const onboarding = onboardingLabels.map((step, stepIndex) => ({ step, status: stepIndex < 2 ? 'Complete' : random() > .55 ? 'Complete' : random() > .45 ? 'In Progress' : 'Pending' }))
 
@@ -42,11 +49,11 @@ function buildProfile(person, index) {
     iNumber: `12${String(3456789 + index * 7319).padStart(7, '0')}`,
     workdayId: `W000${123456789 + index * 48217}`,
     assignments,
-    weeklyData,
+    workdayData,
     onboarding,
     notes: [
-      { id: `${person.id}-1`, author: person.supervisor, date: 'Jun 3, 2026', text: `${person.name.split(' ')[0]} completed the initial check-in. Continue monitoring pacing and weekly hours.` },
-      { id: `${person.id}-2`, author: person.hiringAssistant, date: 'Jun 9, 2026', text: 'Reviewed manual time entries and clarified the department logging expectations.' },
+      { id: `${person.id}-1`, author: person.supervisor, date: 'Jun 3, 2026', week: 1, text: `${person.name.split(' ')[0]} completed the initial check-in. Continue monitoring pacing and weekly hours.` },
+      { id: `${person.id}-2`, author: person.hiringAssistant, date: 'Jun 9, 2026', week: 2, text: 'Reviewed manual time entries and clarified the department logging expectations.' },
     ],
   }
 }
