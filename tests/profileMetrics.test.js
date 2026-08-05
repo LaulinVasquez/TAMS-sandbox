@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { getWorkdayStatus, manualEntryTone, summarizeWorkdayPerformance } from '../src/utils/profileMetrics.js'
+import { getWorkdayStatus, getHoursWatchAlerts, manualEntryTone, summarizeWorkdayPerformance } from '../src/utils/profileMetrics.js'
 
 const record = overrides => ({ expectedHours: 20, workedHours: 20, daysUnder25Minutes: 0, manualEntryPercentage: 5, ...overrides })
 
@@ -37,4 +37,25 @@ test('handles unavailable Workday weeks safely', () => {
   assert.equal(summary.entries, 0)
   assert.equal(summary.totalWorked, 0)
   assert.equal(summary.score, 0)
+})
+
+test('flags TAs below half assigned or above assigned plus 0.5 hours', () => {
+  const profiles = [{
+    id: 'low-hours',
+    name: 'Low Hours',
+    workdayData: [{ week: 2, expectedHours: 20, workedHours: 9 }],
+  }, {
+    id: 'high-hours',
+    name: 'High Hours',
+    workdayData: [{ week: 2, expectedHours: 18, workedHours: 19 }],
+  }, {
+    id: 'on-track',
+    name: 'On Track',
+    workdayData: [{ week: 2, expectedHours: 20, workedHours: 19.5 }],
+  }]
+
+  const alerts = getHoursWatchAlerts(profiles, 2)
+  assert.deepEqual(alerts.map(alert => alert.id), ['low-hours', 'high-hours'])
+  assert.equal(alerts[0].reason, 'below-half')
+  assert.equal(alerts[1].reason, 'above-cap')
 })

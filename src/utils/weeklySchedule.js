@@ -55,3 +55,7 @@ export function calculateWeeklyProgress(tasks, completedIds) {
   const completed = tasks.filter(task => completedIds.has(task.id)).length
   return { completed, total: tasks.length, percentage: tasks.length ? Math.round((completed / tasks.length) * 100) : 0 }
 }
+
+export function toPerformanceWeek(week) {
+  return typeof week === 'number' ? week : null
+}

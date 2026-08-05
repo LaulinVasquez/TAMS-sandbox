@@ -10,10 +10,9 @@ import WeeklyTaskItem from './weeklySchedule/WeeklyTaskItem'
 
 const supervisorId = 'seda-hancer'
 
-export default function WeeklyTaskScheduleCard({ viewingAs = 'Supervisor' }) {
+export default function WeeklyTaskScheduleCard({ viewingAs = 'Supervisor', selectedWeek, onWeekChange }) {
   const current = getCurrentSemesterWeek(semesterConfig.startDate)
   const defaultWeek = current.week ?? 'T-2'
-  const [selectedWeek, setSelectedWeek] = useState(defaultWeek)
   const [inactivePreview, setInactivePreview] = useState(false)
   const [storageError, setStorageError] = useState('')
   const scope = useMemo(() => ({ supervisorId, semesterId: semesterConfig.id, week: selectedWeek }), [selectedWeek])
@@ -28,7 +27,7 @@ export default function WeeklyTaskScheduleCard({ viewingAs = 'Supervisor' }) {
   const previewing = inactivePreview || (current.week != null && String(selectedWeek) !== String(current.week))
 
   function selectWeek(week) {
-    setSelectedWeek(week)
+    onWeekChange?.(week)
     setInactivePreview(current.state !== 'active')
     setStorageError('')
     if (!completedByWeek[String(week)]) {

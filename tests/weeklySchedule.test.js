@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { calculateWeeklyProgress, filterTasksForSupervisor, getCurrentSemesterWeek, getWeekDateRange } from '../src/utils/weeklySchedule.js'
+import { calculateWeeklyProgress, filterTasksForSupervisor, getCurrentSemesterWeek, getWeekDateRange, toPerformanceWeek } from '../src/utils/weeklySchedule.js'
 import { completionStorageKey, loadTaskCompletions, saveTaskCompletions } from '../src/utils/weeklyTaskStorage.js'
 
 test('calculates T-2, T-1, week boundaries, week 14, and post-semester', () => {
@@ -43,4 +43,9 @@ test('persists completion independently by supervisor, semester, and week', () =
   assert.deepEqual([...loadTaskCompletions(weekOne)], ['task-a'])
   assert.deepEqual([...loadTaskCompletions(weekTwo)], [])
   assert.notEqual(completionStorageKey(weekOne), completionStorageKey(weekTwo))
+})
+
+test('maps schedule weeks to performance weeks', () => {
+  assert.equal(toPerformanceWeek(4), 4)
+  assert.equal(toPerformanceWeek('T-1'), null)
 })
