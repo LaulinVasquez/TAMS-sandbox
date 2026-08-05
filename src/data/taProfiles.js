@@ -74,12 +74,12 @@ function buildProfile(person, index) {
     onboarding,
     notes: personDetails.id === 'jordan-park'
       ? [
-        { id: `${personDetails.id}-1`, author: personDetails.supervisor, date: 'Jun 3, 2026', week: 1, text: 'Jordan supports three 6-hour sections this term. Workday reports one combined weekly total, not hours per course.' },
-        { id: `${personDetails.id}-2`, author: personDetails.hiringAssistant, date: 'Jun 9, 2026', week: 2, text: 'Confirmed the 18-hour weekly expectation across ENG 101, COMM 130, and REL 200C.' },
+        { id: `${personDetails.id}-1`, category: 'Performance Review', author: personDetails.supervisor, content: 'Jordan supports three 6-hour sections this term. Workday reports one combined weekly total, not hours per course.', createdAt: '2026-06-03T16:00:00.000Z', updatedAt: '2026-06-03T16:00:00.000Z', week: 1 },
+        { id: `${personDetails.id}-2`, category: 'Hiring Team', author: personDetails.hiringAssistant, content: 'Confirmed the 18-hour weekly expectation across ENG 101, COMM 130, and REL 200C.', createdAt: '2026-06-09T16:00:00.000Z', updatedAt: '2026-06-09T16:00:00.000Z', week: 2 },
       ]
       : [
-        { id: `${personDetails.id}-1`, author: personDetails.supervisor, date: 'Jun 3, 2026', week: 1, text: `${personDetails.name.split(' ')[0]} completed the initial check-in. Continue monitoring pacing and weekly hours.` },
-        { id: `${personDetails.id}-2`, author: personDetails.hiringAssistant, date: 'Jun 9, 2026', week: 2, text: 'Reviewed manual time entries and clarified the department logging expectations.' },
+        { id: `${personDetails.id}-1`, category: 'Performance Review', author: personDetails.supervisor, content: `${personDetails.name.split(' ')[0]} completed the initial check-in. Continue monitoring pacing and weekly hours.`, createdAt: '2026-06-03T16:00:00.000Z', updatedAt: '2026-06-03T16:00:00.000Z', week: 1 },
+        { id: `${personDetails.id}-2`, category: 'Call Summary', author: personDetails.hiringAssistant, content: 'Reviewed manual time entries and clarified the department logging expectations.', createdAt: '2026-06-09T16:00:00.000Z', updatedAt: '2026-06-09T16:00:00.000Z', week: 2 },
       ],
   }
 }

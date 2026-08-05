@@ -24,7 +24,9 @@ TAMS is a responsive React dashboard prototype for managing teaching assistants 
 - Attendance and manual-entry indicators
 - Interactive semester hours trend chart
 - Synchronized week selection across performance details, chart highlighting, and notes
-- Newest-first supervisor notes with keyboard submission
+- Categorized supervisor communication log with colored badges
+- Instant category filtering and text/author search
+- Newest-first notes with keyboard submission, week context, and success feedback
 - Student-support performance placeholder for future metrics
 
 ### Interface
@@ -179,6 +181,7 @@ The test suite covers:
 - Manual-entry severity thresholds
 - Aggregate Workday performance calculations
 - Missing Workday data handling
+- Note category validation, filtering, searching, sorting, and date formatting
 
 ## Data and Prototype Limitations
 
