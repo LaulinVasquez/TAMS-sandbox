@@ -57,3 +57,30 @@ export function statusDetails(score) {
   if (score < 80) return { label: 'Monitor', classes: 'border-amber-400 bg-amber-50 text-amber-700' }
   return { label: 'Good Standing', classes: 'border-emerald-500 bg-emerald-50 text-emerald-700' }
 }
+
+export function isHoursWatchAlert(record) {
+  if (!record) return false
+  const assigned = record.expectedHours
+  return record.workedHours < assigned / 2 || record.workedHours > assigned + 0.5
+}
+
+export function getHoursWatchAlertReason(record) {
+  if (!record) return null
+  if (record.workedHours < record.expectedHours / 2) return 'below-half'
+  if (record.workedHours > record.expectedHours + 0.5) return 'above-cap'
+  return null
+}
+
+export function getHoursWatchAlerts(profiles, week) {
+  return profiles.flatMap(profile => {
+    const record = profile.workdayData.find(entry => entry.week === week)
+    if (!isHoursWatchAlert(record)) return []
+    return [{
+      id: profile.id,
+      name: profile.name,
+      assigned: record.expectedHours,
+      worked: record.workedHours,
+      reason: getHoursWatchAlertReason(record),
+    }]
+  })
+}
