@@ -52,8 +52,8 @@ function buildProfile(person, index) {
     workdayData,
     onboarding,
     notes: [
-      { id: `${person.id}-1`, author: person.supervisor, date: 'Jun 3, 2026', week: 1, text: `${person.name.split(' ')[0]} completed the initial check-in. Continue monitoring pacing and weekly hours.` },
-      { id: `${person.id}-2`, author: person.hiringAssistant, date: 'Jun 9, 2026', week: 2, text: 'Reviewed manual time entries and clarified the department logging expectations.' },
+      { id: `${person.id}-1`, category: 'Performance Review', author: person.supervisor, content: `${person.name.split(' ')[0]} completed the initial check-in. Continue monitoring pacing and weekly hours.`, createdAt: '2026-06-03T16:00:00.000Z', updatedAt: '2026-06-03T16:00:00.000Z', week: 1 },
+      { id: `${person.id}-2`, category: 'Call Summary', author: person.hiringAssistant, content: 'Reviewed manual time entries and clarified the department logging expectations.', createdAt: '2026-06-09T16:00:00.000Z', updatedAt: '2026-06-09T16:00:00.000Z', week: 2 },
     ],
   }
 }
