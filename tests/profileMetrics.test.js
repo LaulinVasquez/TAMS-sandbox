@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { getWorkdayStatus, getHoursWatchAlerts, manualEntryTone, summarizeWorkdayPerformance } from '../src/utils/profileMetrics.js'
+import { taProfiles } from '../src/data/taProfiles.js'
 
 const record = overrides => ({ expectedHours: 20, workedHours: 20, daysUnder25Minutes: 0, manualEntryPercentage: 5, ...overrides })
 
@@ -58,4 +59,14 @@ test('flags TAs below half assigned or above assigned plus 0.5 hours', () => {
   assert.deepEqual(alerts.map(alert => alert.id), ['low-hours', 'high-hours'])
   assert.equal(alerts[0].reason, 'below-half')
   assert.equal(alerts[1].reason, 'above-cap')
+})
+
+test('supports varied per-section hour allocations and derives weekly expected hours', () => {
+  const allocations = new Set(taProfiles.flatMap(profile => profile.assignments.map(assignment => assignment.maxHours)))
+  assert.ok([3, 5, 10].every(hours => allocations.has(hours)))
+  assert.ok(allocations.size > 1)
+  for (const profile of taProfiles) {
+    const assignedTotal = profile.assignments.reduce((sum, assignment) => sum + assignment.maxHours, 0)
+    assert.ok(profile.workdayData.every(week => week.expectedHours === assignedTotal))
+  }
 })

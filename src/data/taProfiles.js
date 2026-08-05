@@ -27,6 +27,8 @@ const courses = [
   ['BIO 180 01', 'Prof. Nguyen'], ['MATH 221 04', 'Dr. Jensen'], ['COMM 130 02', 'Prof. Baker'],
 ]
 
+const assignedHourOptions = [3, 5, 10]
+
 function seededRandom(seed) {
   let value = seed
   return () => {
@@ -47,7 +49,7 @@ function buildProfile(person, index) {
       const [courseLabel, instructor] = courses[(index + offset) % courses.length]
       const parts = courseLabel.split(' ')
       const section = parts.pop()
-      return { course: parts.join(' '), section, instructor, status: offset === 0 ? person.level : `Level ${1 + Math.floor(random() * 3)}`, maxHours: 10 }
+    return { course: parts.join(' '), section, instructor, status: offset === 0 ? person.level : `Level ${1 + Math.floor(random() * 3)}`, maxHours: assignedHourOptions[(index + offset) % assignedHourOptions.length] }
     })
   const expectedHours = assignments.reduce((sum, assignment) => sum + assignment.maxHours, 0)
   const workdayData = Array.from({ length: 14 }, (_, weekIndex) => {
