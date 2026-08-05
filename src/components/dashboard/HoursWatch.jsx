@@ -4,8 +4,8 @@ import Card from '../ui/Card'
 import { getHoursWatchAlerts } from '../../utils/profileMetrics'
 
 const reasonLabels = {
-  'below-half': 'Below half assigned',
-  'above-cap': 'Over assigned + 0.5',
+  'below-hours': 'Below Hours',
+  'over-hours': 'Over Hours',
 }
 
 export default function HoursWatch({ profiles, week, scheduleWeek, onSelectProfile, onReviewList }) {
@@ -19,7 +19,7 @@ export default function HoursWatch({ profiles, week, scheduleWeek, onSelectProfi
           <h2 className="section-label font-semibold tracking-wider">Hours-to-Cap Watch</h2>
           <p className="mt-1 text-xs text-muted">
             {typeof scheduleWeek === 'number'
-              ? `Week ${scheduleWeek} · below half assigned or over assigned + 0.5 hrs`
+              ? `Week ${scheduleWeek} · Below Hours or Over Hours`
               : 'Linked to Weekly Task Schedule · select Week 1–14 for hours data'}
           </p>
         </div>
@@ -52,7 +52,7 @@ export default function HoursWatch({ profiles, week, scheduleWeek, onSelectProfi
                       <span className="block truncate text-sm font-medium text-slate-800">{alert.name}</span>
                       <span className="text-[11px] text-muted">{alert.worked} / {alert.assigned} hrs</span>
                     </span>
-                    <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${alert.reason === 'below-half' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-700'}`}>
+                    <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${alert.reason === 'below-hours' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-700'}`}>
                       {reasonLabels[alert.reason]}
                     </span>
                   </button>

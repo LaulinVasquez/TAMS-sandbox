@@ -60,14 +60,12 @@ export function statusDetails(score) {
 
 export function isHoursWatchAlert(record) {
   if (!record) return false
-  const assigned = record.expectedHours
-  return record.workedHours < assigned / 2 || record.workedHours > assigned + 0.5
+  return getWorkdayStatus(record) === 'Below Hours' || record.workedHours > record.expectedHours + 0.5
 }
 
 export function getHoursWatchAlertReason(record) {
-  if (!record) return null
-  if (record.workedHours < record.expectedHours / 2) return 'below-half'
-  if (record.workedHours > record.expectedHours + 0.5) return 'above-cap'
+  if (getWorkdayStatus(record) === 'Below Hours') return 'below-hours'
+  if (record.workedHours > record.expectedHours + 0.5) return 'over-hours'
   return null
 }
 
