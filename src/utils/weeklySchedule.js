@@ -45,7 +45,9 @@ export function getTasksForWeek(tasks, week) {
 }
 
 export function filterTasksForSupervisor(tasks, assignedRole = 'Supervisor') {
-  const allowed = new Set(['Everyone', 'Supervisors', assignedRole])
+  const allowed = new Set(['Everyone'])
+  if (assignedRole === 'Supervisor') allowed.add('Supervisors')
+  else allowed.add(assignedRole)
   return tasks.filter(task => task.assignedTo.some(role => allowed.has(role)))
 }
 
