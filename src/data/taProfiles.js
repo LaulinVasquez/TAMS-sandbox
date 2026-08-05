@@ -5,6 +5,21 @@ const people = [
   { id: 'ethan-brooks', name: 'Ethan Brooks', email: 'ebrooks@byui.edu', phone: '(208) 496-6620', hiringAssistant: 'Cristian Velasquez', supervisor: 'Seda Hancer', returning: true, level: 'Level 2' },
   { id: 'sofia-martinez', name: 'Sofia Martinez', email: 'smartinez@byui.edu', phone: '(208) 496-3908', hiringAssistant: 'Josh Whitman', supervisor: 'Laurin Vasquez', returning: false, level: 'Level 1' },
   { id: 'noah-williams', name: 'Noah Williams', email: 'nwilliams@byui.edu', phone: '(208) 496-5519', hiringAssistant: 'Emmanuel Otieno', supervisor: 'Seda Hancer', returning: true, level: 'Level 3' },
+  {
+    id: 'jordan-park',
+    name: 'Jordan Park',
+    email: 'jpark@byui.edu',
+    phone: '(208) 496-8842',
+    hiringAssistant: 'Josh Whitman',
+    supervisor: 'Seda Hancer',
+    returning: false,
+    level: 'Level 1',
+    assignmentPlan: [
+      { course: 'ENG 101', section: '05', instructor: 'Dr. Smith', maxHours: 6 },
+      { course: 'COMM 130', section: '04', instructor: 'Prof. Baker', maxHours: 6 },
+      { course: 'REL 200C', section: '02', instructor: 'Prof. Allen', maxHours: 6 },
+    ],
+  },
 ]
 
 const courses = [
@@ -21,13 +36,19 @@ function seededRandom(seed) {
 }
 
 function buildProfile(person, index) {
+  const { assignmentPlan, ...personDetails } = person
   const random = seededRandom(1049 + index * 317)
-  const assignments = [0, 1].map(offset => {
-    const [courseLabel, instructor] = courses[(index + offset) % courses.length]
-    const parts = courseLabel.split(' ')
-    const section = parts.pop()
-    return { course: parts.join(' '), section, instructor, status: offset === 0 ? person.level : `Level ${1 + Math.floor(random() * 3)}`, maxHours: 10 }
-  })
+  const assignments = assignmentPlan
+    ? assignmentPlan.map((assignment, offset) => ({
+      ...assignment,
+      status: offset === 0 ? person.level : `Level ${1 + Math.floor(random() * 3)}`,
+    }))
+    : [0, 1].map(offset => {
+      const [courseLabel, instructor] = courses[(index + offset) % courses.length]
+      const parts = courseLabel.split(' ')
+      const section = parts.pop()
+      return { course: parts.join(' '), section, instructor, status: offset === 0 ? person.level : `Level ${1 + Math.floor(random() * 3)}`, maxHours: 10 }
+    })
   const expectedHours = assignments.reduce((sum, assignment) => sum + assignment.maxHours, 0)
   const workdayData = Array.from({ length: 14 }, (_, weekIndex) => {
     const workedHours = Number((expectedHours - 3.5 + random() * 6).toFixed(2))
@@ -44,17 +65,22 @@ function buildProfile(person, index) {
   const onboarding = onboardingLabels.map((step, stepIndex) => ({ step, status: stepIndex < 2 ? 'Complete' : random() > .55 ? 'Complete' : random() > .45 ? 'In Progress' : 'Pending' }))
 
   return {
-    ...person,
+    ...personDetails,
     role: 'Teaching Assistant',
     iNumber: `12${String(3456789 + index * 7319).padStart(7, '0')}`,
     workdayId: `W000${123456789 + index * 48217}`,
     assignments,
     workdayData,
     onboarding,
-    notes: [
-      { id: `${person.id}-1`, category: 'Performance Review', author: person.supervisor, content: `${person.name.split(' ')[0]} completed the initial check-in. Continue monitoring pacing and weekly hours.`, createdAt: '2026-06-03T16:00:00.000Z', updatedAt: '2026-06-03T16:00:00.000Z', week: 1 },
-      { id: `${person.id}-2`, category: 'Call Summary', author: person.hiringAssistant, content: 'Reviewed manual time entries and clarified the department logging expectations.', createdAt: '2026-06-09T16:00:00.000Z', updatedAt: '2026-06-09T16:00:00.000Z', week: 2 },
-    ],
+    notes: personDetails.id === 'jordan-park'
+      ? [
+        { id: `${personDetails.id}-1`, category: 'Performance Review', author: personDetails.supervisor, content: 'Jordan supports three 6-hour sections this term. Workday reports one combined weekly total, not hours per course.', createdAt: '2026-06-03T16:00:00.000Z', updatedAt: '2026-06-03T16:00:00.000Z', week: 1 },
+        { id: `${personDetails.id}-2`, category: 'Hiring Team', author: personDetails.hiringAssistant, content: 'Confirmed the 18-hour weekly expectation across ENG 101, COMM 130, and REL 200C.', createdAt: '2026-06-09T16:00:00.000Z', updatedAt: '2026-06-09T16:00:00.000Z', week: 2 },
+      ]
+      : [
+        { id: `${personDetails.id}-1`, category: 'Performance Review', author: personDetails.supervisor, content: `${personDetails.name.split(' ')[0]} completed the initial check-in. Continue monitoring pacing and weekly hours.`, createdAt: '2026-06-03T16:00:00.000Z', updatedAt: '2026-06-03T16:00:00.000Z', week: 1 },
+        { id: `${personDetails.id}-2`, category: 'Call Summary', author: personDetails.hiringAssistant, content: 'Reviewed manual time entries and clarified the department logging expectations.', createdAt: '2026-06-09T16:00:00.000Z', updatedAt: '2026-06-09T16:00:00.000Z', week: 2 },
+      ],
   }
 }
 

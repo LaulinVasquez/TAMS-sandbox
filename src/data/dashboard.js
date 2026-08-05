@@ -5,11 +5,6 @@ export const actionItems = [
   { label: 'Added to MS Teams', count: 52, total: 56, percentage: 93, caption: '93% added', color: 'bg-emerald-500' },
 ]
 
-export const hoursCapWatch = {
-  count: 9,
-  threshold: 80,
-}
-
 export const weeklyPerformance = {
   1: { hoursUtilization: 52, onTrack: 61, missingDays: 18, manualEntries: 64 },
   2: { hoursUtilization: 67, onTrack: 72, missingDays: 12, manualEntries: 50 },
