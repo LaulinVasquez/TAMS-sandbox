@@ -27,6 +27,7 @@ test('filters unrelated roles and calculates task progress', () => {
   ]
   const filtered = filterTasksForSupervisor(tasks)
   assert.deepEqual(filtered.map(task => task.id), ['a', 'b'])
+  assert.deepEqual(filterTasksForSupervisor(tasks, 'Administrator').map(task => task.id), ['b'])
   assert.deepEqual(calculateWeeklyProgress(filtered, new Set(['a'])), { completed: 1, total: 2, percentage: 50 })
 })
 
