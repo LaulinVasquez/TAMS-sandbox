@@ -70,3 +70,11 @@ test('supports varied per-section hour allocations and derives weekly expected h
     assert.ok(profile.workdayData.every(week => week.expectedHours === assignedTotal))
   }
 })
+
+test('supports two 10-hour sections in course assignments and performance records', () => {
+  for (const id of ['hannah-cho', 'priya-shah']) {
+    const profile = taProfiles.find(item => item.id === id)
+    assert.deepEqual(profile.assignments.map(assignment => assignment.maxHours), [10, 10])
+    assert.ok(profile.workdayData.every(week => week.expectedHours === 20))
+  }
+})
