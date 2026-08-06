@@ -33,14 +33,25 @@ export default function TATraining({ collapsed }) {
 
       <Card className="overflow-hidden">
         <header className="p-6 pb-0"><h2 className="font-semibold">Required training</h2><p className="mt-1 text-xs text-muted">Begin with the orientation video, then complete each assigned module.</p>
-          <nav aria-label="Required training sections" className="mt-5 flex border-b border-slate-200">
+          <nav aria-label="Required training sections" className="mt-5 flex overflow-x-auto border-b border-slate-200">
             <TrainingTab active={activeTab === 'start'} onClick={() => setActiveTab('start')}>Start Here</TrainingTab>
+            <TrainingTab active={activeTab === 'academic-partnership'} onClick={() => setActiveTab('academic-partnership')}>Academic Partnership Weekly Communication</TrainingTab>
             <TrainingTab active={activeTab === 'modules'} onClick={() => setActiveTab('modules')}>Modules</TrainingTab>
           </nav>
         </header>
         {activeTab === 'start' && <section className="p-6 pt-5" aria-labelledby="start-here-heading">
           <div className="mb-4"><h3 id="start-here-heading" className="font-semibold text-slate-900">TA Training Orientation</h3><p className="mt-1 text-xs text-muted">Watch this introduction before beginning the required modules.</p></div>
-          <ResponsiveKalturaPlayer />
+          <ResponsiveKalturaPlayer
+            title="TA Training Orientation"
+            src="https://cdnapisec.kaltura.com/p/1157612/sp/115761200/embedIframeJs/uiconf_id/41338032/partner_id/1157612?iframeembed=true&amp;playerId=kaltura_player&amp;entry_id=1_p1qlb8dj&amp;flashvars[localizationCode]=en&amp;flashvars[sideBarContainer.plugin]=true&amp;flashvars[sideBarContainer.position]=left&amp;flashvars[sideBarContainer.clickToClose]=true&amp;flashvars[chapters.plugin]=true&amp;flashvars[chapters.layout]=vertical&amp;flashvars[chapters.thumbnailRotator]=false&amp;flashvars[streamSelector.plugin]=true&amp;flashvars[EmbedPlayer.SpinnerTarget]=videoHolder&amp;flashvars[dualScreen.plugin]=true&amp;flashvars[Kaltura.addCrossoriginToIframe]=true&amp;&amp;wid=1_1j4dayje"
+          />
+        </section>}
+        {activeTab === 'academic-partnership' && <section className="p-6 pt-5" aria-labelledby="academic-partnership-heading">
+          <div className="mb-4"><h3 id="academic-partnership-heading" className="font-semibold text-slate-900">Academic Partnership Weekly Communication</h3><p className="mt-1 text-xs text-muted">Review the weekly communication expectations for supporting a strong academic partnership.</p></div>
+          <ResponsiveKalturaPlayer
+            title="Academic Partnership Weekly Communication"
+            src="https://cdnapisec.kaltura.com/p/1157612/sp/115761200/embedIframeJs/uiconf_id/41338032/partner_id/1157612?iframeembed=true&amp;playerId=kaltura_player&amp;entry_id=1_3ppt8f72&amp;flashvars[localizationCode]=en&amp;flashvars[sideBarContainer.plugin]=true&amp;flashvars[sideBarContainer.position]=left&amp;flashvars[sideBarContainer.clickToClose]=true&amp;flashvars[chapters.plugin]=true&amp;flashvars[chapters.layout]=vertical&amp;flashvars[chapters.thumbnailRotator]=false&amp;flashvars[streamSelector.plugin]=true&amp;flashvars[EmbedPlayer.SpinnerTarget]=videoHolder&amp;flashvars[dualScreen.plugin]=true&amp;flashvars[Kaltura.addCrossoriginToIframe]=true&amp;&amp;wid=1_ucnsgb7f"
+          />
         </section>}
         {activeTab === 'modules' && <div className="divide-y divide-slate-100">
           {modules.map(module => <article key={module.title} className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center">
@@ -58,7 +69,7 @@ export default function TATraining({ collapsed }) {
   </main>
 }
 
-function ResponsiveKalturaPlayer() {
+function ResponsiveKalturaPlayer({ src, title }) {
   const containerRef = useRef(null)
   const [scale, setScale] = useState(1)
 
@@ -78,8 +89,8 @@ function ResponsiveKalturaPlayer() {
       height="402"
       className="block origin-top-left"
       style={{ transform: `scale(${scale})` }}
-      src="https://cdnapisec.kaltura.com/p/1157612/sp/115761200/embedIframeJs/uiconf_id/41338032/partner_id/1157612?iframeembed=true&amp;playerId=kaltura_player&amp;entry_id=1_p1qlb8dj&amp;flashvars[localizationCode]=en&amp;flashvars[sideBarContainer.plugin]=true&amp;flashvars[sideBarContainer.position]=left&amp;flashvars[sideBarContainer.clickToClose]=true&amp;flashvars[chapters.plugin]=true&amp;flashvars[chapters.layout]=vertical&amp;flashvars[chapters.thumbnailRotator]=false&amp;flashvars[streamSelector.plugin]=true&amp;flashvars[EmbedPlayer.SpinnerTarget]=videoHolder&amp;flashvars[dualScreen.plugin]=true&amp;flashvars[Kaltura.addCrossoriginToIframe]=true&amp;&amp;wid=1_1j4dayje"
-      title="TA Training Orientation"
+      src={src}
+      title={title}
       allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
       allowFullScreen
     />
@@ -87,7 +98,7 @@ function ResponsiveKalturaPlayer() {
 }
 
 function TrainingTab({ active, onClick, children }) {
-  return <button type="button" role="tab" aria-selected={active} onClick={onClick} className={`border-b-2 px-4 py-2.5 text-sm font-medium ${active ? 'border-brand text-brand' : 'border-transparent text-slate-500 hover:text-slate-900'}`}>{children}</button>
+  return <button type="button" role="tab" aria-selected={active} onClick={onClick} className={`shrink-0 whitespace-nowrap border-b-2 px-4 py-2.5 text-left text-sm font-medium ${active ? 'border-brand text-brand' : 'border-transparent text-slate-500 hover:text-slate-900'}`}>{children}</button>
 }
 
 function Summary({ icon, label, value, detail }) {
