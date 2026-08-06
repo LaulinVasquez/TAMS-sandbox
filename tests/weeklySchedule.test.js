@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { calculateWeeklyProgress, filterTasksForSupervisor, getCurrentSemesterWeek, getWeekDateRange, toPerformanceWeek } from '../src/utils/weeklySchedule.js'
+import { calculateWeeklyProgress, filterTasksForSupervisor, getCurrentSemesterWeek, getFullyCompletedWeeks, getWeekDateRange, isWeekFullyComplete, toPerformanceWeek } from '../src/utils/weeklySchedule.js'
 import { completionStorageKey, loadTaskCompletions, saveTaskCompletions } from '../src/utils/weeklyTaskStorage.js'
 
 test('calculates T-2, T-1, week boundaries, week 14, and post-semester', () => {
@@ -48,4 +48,21 @@ test('persists completion independently by supervisor, semester, and week', () =
 test('maps schedule weeks to performance weeks', () => {
   assert.equal(toPerformanceWeek(4), 4)
   assert.equal(toPerformanceWeek('T-1'), null)
+})
+
+test('marks a week complete only when every visible task is checked', () => {
+  const tasks = [
+    { id: 'a', week: 1, assignedTo: ['Supervisors'] },
+    { id: 'b', week: 1, assignedTo: ['Everyone'] },
+    { id: 'c', week: 2, assignedTo: ['Supervisors'] },
+  ]
+  const completedByWeek = {
+    1: new Set(['a']),
+    2: new Set(['c']),
+  }
+
+  assert.equal(isWeekFullyComplete(1, completedByWeek[1], tasks), false)
+  assert.equal(isWeekFullyComplete(1, new Set(['a', 'b']), tasks), true)
+  assert.equal(isWeekFullyComplete(2, completedByWeek[2], tasks), true)
+  assert.deepEqual([...getFullyCompletedWeeks(completedByWeek, tasks)], ['2'])
 })
