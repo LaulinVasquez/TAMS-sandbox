@@ -1,4 +1,4 @@
-import { BookOpenCheck, CalendarClock, Check, CheckCircle2, Circle, PlayCircle } from 'lucide-react'
+import { BookOpenCheck, CalendarClock, Check, CheckCircle2, Circle } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import Card from '../components/ui/Card'
 
@@ -17,8 +17,6 @@ export default function TATraining({ collapsed }) {
   useEffect(() => localStorage.setItem(completionKey, JSON.stringify(completion)), [completion])
 
   const updateCompletion = (video, watched) => setCompletion(current => ({ ...current, [video]: watched }))
-  const continueTraining = () => setActiveTab(!completion.start ? 'start' : !completion.academicPartnership ? 'academic-partnership' : 'general-notes')
-
   return <main className={`min-h-screen px-[31px] pb-16 pt-[130px] transition-all ${collapsed ? 'ml-16' : 'ml-56'}`}>
     <div className="mx-auto max-w-[1291px]">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
@@ -27,7 +25,6 @@ export default function TATraining({ collapsed }) {
           <h1 className="mt-1 text-[25px] font-bold">TA Training</h1>
           <p className="mt-2 text-[13px] text-slate-500">Manage required training and track completion for Fall 2026.</p>
         </div>
-        <button onClick={continueTraining} className="inline-flex h-10 items-center gap-2 rounded-md bg-brand px-4 text-sm font-semibold text-white hover:opacity-90"><PlayCircle size={16} />Continue training</button>
       </header>
 
       <div className="mb-4 grid gap-4 md:grid-cols-3">
