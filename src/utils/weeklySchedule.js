@@ -56,6 +56,19 @@ export function calculateWeeklyProgress(tasks, completedIds) {
   return { completed, total: tasks.length, percentage: tasks.length ? Math.round((completed / tasks.length) * 100) : 0 }
 }
 
+export function isWeekFullyComplete(week, completedIds, tasks, viewingAs = 'Supervisor') {
+  const weekTasks = filterTasksForSupervisor(getTasksForWeek(tasks, week), viewingAs)
+  return weekTasks.length > 0 && weekTasks.every(task => completedIds.has(task.id))
+}
+
+export function getFullyCompletedWeeks(completedByWeek, tasks, viewingAs = 'Supervisor') {
+  return new Set(
+    Object.entries(completedByWeek)
+      .filter(([week, completedIds]) => isWeekFullyComplete(week, completedIds, tasks, viewingAs))
+      .map(([week]) => week),
+  )
+}
+
 export function toPerformanceWeek(week) {
   return typeof week === 'number' ? week : null
 }

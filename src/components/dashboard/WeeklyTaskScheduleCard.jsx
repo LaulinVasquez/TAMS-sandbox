@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import Card from '../ui/Card'
 import { semesterConfig, semesterWeeks, weeklyTaskSchedule } from '../../data/weeklyTaskSchedule'
-import { calculateWeeklyProgress, filterTasksForSupervisor, formatWeekDateRange, getCurrentSemesterWeek, getTasksForWeek } from '../../utils/weeklySchedule'
+import { calculateWeeklyProgress, filterTasksForSupervisor, formatWeekDateRange, getCurrentSemesterWeek, getFullyCompletedWeeks, getTasksForWeek } from '../../utils/weeklySchedule'
 import { loadTaskCompletions, saveTaskCompletions } from '../../utils/weeklyTaskStorage'
 import WeekIndicatorList from './weeklySchedule/WeekIndicatorList'
 import WeeklyProgress from './weeklySchedule/WeeklyProgress'
@@ -23,7 +23,10 @@ export default function WeeklyTaskScheduleCard({ viewingAs = 'Supervisor', selec
   const tasks = filterTasksForSupervisor(getTasksForWeek(weeklyTaskSchedule, selectedWeek), viewingAs)
   const completedIds = completedByWeek[String(selectedWeek)] ?? new Set()
   const progress = calculateWeeklyProgress(tasks, completedIds)
-  const completedWeeks = new Set(Object.entries(completedByWeek).filter(([, ids]) => ids.size > 0).map(([week]) => week))
+  const completedWeeks = useMemo(
+    () => getFullyCompletedWeeks(completedByWeek, weeklyTaskSchedule, viewingAs),
+    [completedByWeek, viewingAs],
+  )
   const previewing = inactivePreview || (current.week != null && String(selectedWeek) !== String(current.week))
 
   function selectWeek(week) {
