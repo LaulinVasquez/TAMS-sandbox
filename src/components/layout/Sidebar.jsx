@@ -2,7 +2,8 @@ import { BookOpen, BriefcaseBusiness, CalendarDays, ChevronLeft, ChevronRight, G
 
 const primary = [
   { label: 'Dashboard', icon: LayoutGrid, view: 'dashboard' }, { label: 'Sections', icon: BookOpen },
-  { label: 'Courses', icon: GraduationCap }, { label: 'TAs', icon: UsersRound, view: 'tas' }, { label: 'Instructors', icon: UsersRound },
+  { label: 'Courses', icon: GraduationCap }, { label: 'TAs', icon: UsersRound, view: 'tas' },
+  { label: 'TA Training', icon: GraduationCap, view: 'ta-training' }, { label: 'Instructors', icon: UsersRound },
 ]
 const boards = [
   { label: 'Hiring Assistant', icon: BriefcaseBusiness }, { label: 'Scheduling Assistant', icon: CalendarDays },
