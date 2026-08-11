@@ -1,4 +1,4 @@
-import { trainingModules } from '../data/training'
+import { trainingModules } from '../data/training.js'
 
 export function getTrainingProgress(completion = {}) {
   const completed = trainingModules.filter(module => completion[module.id]).length
