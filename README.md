@@ -1,6 +1,6 @@
 # TAMS Dashboard
 
-TAMS is a responsive React dashboard prototype for managing teaching assistants and supervisor workflows. It includes a supervisor dashboard, TA directory, individual profiles, semester-aware task scheduling, and Workday-based performance analytics.
+TAMS is a responsive React dashboard prototype for managing teaching assistants and supervisor workflows. It includes a supervisor dashboard, TA directory, individual profiles, semester-aware task scheduling, Workday-based performance analytics, and a TA training center.
 
 ## Features
 
@@ -28,6 +28,19 @@ TAMS is a responsive React dashboard prototype for managing teaching assistants 
 - Instant category filtering and text/author search
 - Newest-first notes with keyboard submission, week context, and success feedback
 - Student-support performance placeholder for future metrics
+
+### TA Training
+
+- Dedicated TA Training destination that retains the shared sidebar and top bar
+- Supervisor overview for Seda Hancer's team with enrollment and completion summaries
+- Search and status filters for Complete, In Progress, Not Started, and Overdue TAs
+- Per-video progress indicators and direct links to individual TA profiles
+- Required-video deadlines, overdue counts, and follow-up alerts
+- Responsive embedded Kaltura videos that preserve each player's supported viewport
+- TA experience preview with three required training videos
+- Self-reported **Yes, I watched it** and **Not yet** completion controls
+- Green and red selected states with clear completion feedback
+- Browser persistence for the TA preview's video-completion answers
 
 ### Interface
 
@@ -117,9 +130,10 @@ src/
 |   |-- dashboard/       # Dashboard and weekly schedule components
 |   |-- layout/          # Sidebar and top navigation
 |   |-- profile/         # Profile tabs, Workday cards, chart, and notes
+|   |-- training/        # Supervisor progress view and TA video player
 |   `-- ui/              # Shared cards and progress components
-|-- data/                # Dashboard, profile, and schedule data
-|-- pages/               # Dashboard, directory, and profile views
+|-- data/                # Dashboard, profile, schedule, and training data
+|-- pages/               # Dashboard, directory, profile, and training views
 |-- styles/              # Global and Tailwind styles
 |-- utils/               # Calculations, statuses, and persistence helpers
 |-- App.jsx              # Application shell and view state
@@ -170,6 +184,35 @@ src/utils/profileMetrics.js
 
 The interactive trend chart is implemented with accessible SVG and does not require a charting dependency.
 
+## TA Performance Metrics
+
+The dashboard's TA Performance card summarizes the selected week across 56 TAs:
+
+- **Hours Utilization:** average worked hours divided by maximum assigned hours
+- **Pacing Policy (On Track):** percentage of TAs meeting weekly pacing expectations
+- **Pacing Policy Missing %:** average percentage of required workdays missed; lower is better
+- **Manual Entry Weeks:** percentage of TAs with manual time entries; lower is better
+
+The team score weights all four measures equally:
+
+```text
+(Hours Utilization + On Track + (100 - Missing %) + (100 - Manual Entry %)) / 4
+```
+
+Scores of 80 or higher are **Good Standing**, 60-79 are **Monitor**, and scores below 60 are **Needs Attention**.
+
+## Training Configuration
+
+Training module labels and Fall 2026 deadlines are defined in:
+
+```text
+src/data/training.js
+```
+
+Training progress, status, filtering, and overdue calculations are centralized in `src/utils/training.js`. Supervisor table rows use seeded profile data from `src/data/taProfiles.js`. The TA experience preview stores its self-reported answers under the `tams-training-video-completion` browser-storage key.
+
+The Kaltura videos are third-party iframe embeds. Their containers scale visually on narrow screens while retaining the players' native internal dimensions to avoid unsupported compact layouts.
+
 ## Tests
 
 The test suite covers:
@@ -182,12 +225,29 @@ The test suite covers:
 - Aggregate Workday performance calculations
 - Missing Workday data handling
 - Note category validation, filtering, searching, sorting, and date formatting
+- Training progress and status calculations
+- Training status filtering
+- Deadline and overdue-module detection
+
+## Vercel Deployment
+
+The project can be deployed as a standard Vite application:
+
+| Setting | Value |
+| --- | --- |
+| Framework preset | Vite |
+| Install command | `npm install` |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Recommended Node.js version | 20.x |
+
+No environment variables or `vercel.json` file are currently required.
 
 ## Data and Prototype Limitations
 
-This repository is a frontend dashboard prototype. Profile, dashboard, and Workday records are generated local data. Weekly task completion and theme preferences use browser storage.
+This repository is a frontend dashboard prototype. Profile, dashboard, Workday, and supervisor training-progress records are generated local data. Weekly task completion, theme preferences, and TA-preview video completion use browser storage.
 
-New supervisor notes currently remain in component state and do not persist after a full reload. Before production use, connect profiles, Workday records, notes, and task completion to authenticated backend endpoints with role-based authorization.
+Video completion is currently self-reported; the application does not verify playback completion through the cross-origin Kaltura players. New supervisor notes remain in component state and do not persist after a full reload. Before production use, connect profiles, Workday records, notes, task completion, and training progress to authenticated backend endpoints with role-based authorization.
 
 ## Browser Support
 
