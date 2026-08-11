@@ -20,3 +20,12 @@ export function filterProfilesByTrainingStatus(profiles, status) {
   if (!status || status === 'all') return profiles
   return profiles.filter(profile => getTrainingStatus(profile.trainingCompletion) === status)
 }
+
+export function isTrainingModuleOverdue(module, completion = {}, referenceDate = new Date()) {
+  if (completion[module.id]) return false
+  return referenceDate > new Date(`${module.dueDate}T23:59:59`)
+}
+
+export function getOverdueTrainingModules(completion = {}, referenceDate = new Date()) {
+  return trainingModules.filter(module => isTrainingModuleOverdue(module, completion, referenceDate))
+}

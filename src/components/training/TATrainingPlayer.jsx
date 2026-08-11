@@ -1,6 +1,8 @@
 import { BookOpenCheck, CalendarClock, Check, CheckCircle2, Circle } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import Card from '../ui/Card'
+import { trainingModules } from '../../data/training'
+import { isTrainingModuleOverdue } from '../../utils/training'
 
 const completionKey = 'tams-training-video-completion'
 const defaultCompletion = { start: null, academicPartnership: null, generalNotes: null }
@@ -54,6 +56,7 @@ export default function TATrainingPlayer({ onBack }) {
             <div className="mb-4">
               <h3 id="start-here-heading" className="font-semibold text-slate-900">TA Training Orientation</h3>
               <p className="mt-1 text-xs text-muted">Watch this introduction before beginning the required modules.</p>
+              <TrainingDeadline moduleId="start" complete={completion.start} />
             </div>
             <ResponsiveKalturaPlayer
               title="TA Training Orientation"
@@ -67,6 +70,7 @@ export default function TATrainingPlayer({ onBack }) {
             <div className="mb-4">
               <h3 id="academic-partnership-heading" className="font-semibold text-slate-900">Academic Partnership Weekly Communication</h3>
               <p className="mt-1 text-xs text-muted">Review the weekly communication expectations for supporting a strong academic partnership.</p>
+              <TrainingDeadline moduleId="academicPartnership" complete={completion.academicPartnership} />
             </div>
             <ResponsiveKalturaPlayer
               title="Academic Partnership Weekly Communication"
@@ -80,6 +84,7 @@ export default function TATrainingPlayer({ onBack }) {
             <div className="mb-4">
               <h3 id="general-notes-heading" className="font-semibold text-slate-900">General Teaching Notes and TA Notes</h3>
               <p className="mt-1 text-xs text-muted">Review expectations for documenting general teaching notes and TA-specific notes.</p>
+              <TrainingDeadline moduleId="generalNotes" complete={completion.generalNotes} />
             </div>
             <ResponsiveKalturaPlayer
               width={480}
@@ -93,6 +98,13 @@ export default function TATrainingPlayer({ onBack }) {
       </Card>
     </>
   )
+}
+
+function TrainingDeadline({ moduleId, complete }) {
+  const module = trainingModules.find(item => item.id === moduleId)
+  const overdue = isTrainingModuleOverdue(module, { [moduleId]: complete })
+  const deadline = new Date(`${module.dueDate}T12:00:00`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  return <span className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${complete ? 'bg-emerald-50 text-emerald-700' : overdue ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'}`}>{complete ? `Completed · Due ${deadline}` : overdue ? `Overdue · Was due ${deadline}` : `Due ${deadline}`}</span>
 }
 
 function ResponsiveKalturaPlayer({ src, title, width = 608, height = 402 }) {
