@@ -1,7 +1,8 @@
 const people = [
   {
     id: 'hannah-cho',
-    name: 'Hannah Cho',
+    name: 'Avery Adams',
+    iNumber: '700000001',
     email: 'hcho@byui.edu',
     phone: '(208) 496-4307',
     hiringAssistant: 'Josh Whitman',
@@ -13,10 +14,11 @@ const people = [
       { course: 'REL 200C', section: '03', instructor: 'Prof. Allen', maxHours: 10 },
     ],
   },
-  { id: 'marcus-reed', name: 'Marcus Reed', email: 'mreed@byui.edu', phone: '(208) 496-2184', hiringAssistant: 'Emmanuel Otieno', supervisor: 'Seda Hancer', returning: false, level: 'Level 1', trainingCompletion: { start: false, academicPartnership: false, generalNotes: false } },
+  { id: 'marcus-reed', name: 'Jordan Adams', iNumber: '700000002', email: 'mreed@byui.edu', phone: '(208) 496-2184', hiringAssistant: 'Emmanuel Otieno', supervisor: 'Seda Hancer', returning: false, level: 'Level 1', trainingCompletion: { start: false, academicPartnership: false, generalNotes: false } },
   {
     id: 'priya-shah',
-    name: 'Priya Shah',
+    name: 'Taylor Adams',
+    iNumber: '700000003',
     email: 'pshah@byui.edu',
     phone: '(208) 496-7741',
     hiringAssistant: 'Alejandro Ramirez',
@@ -28,12 +30,13 @@ const people = [
       { course: 'BIO 180', section: '01', instructor: 'Prof. Nguyen', maxHours: 10 },
     ],
   },
-  { id: 'ethan-brooks', name: 'Ethan Brooks', email: 'ebrooks@byui.edu', phone: '(208) 496-6620', hiringAssistant: 'Cristian Velasquez', supervisor: 'Seda Hancer', returning: true, level: 'Level 2', trainingCompletion: { start: true, academicPartnership: false, generalNotes: false } },
-  { id: 'sofia-martinez', name: 'Sofia Martinez', email: 'smartinez@byui.edu', phone: '(208) 496-3908', hiringAssistant: 'Josh Whitman', supervisor: 'Laurin Vasquez', returning: false, level: 'Level 1' },
-  { id: 'noah-williams', name: 'Noah Williams', email: 'nwilliams@byui.edu', phone: '(208) 496-5519', hiringAssistant: 'Emmanuel Otieno', supervisor: 'Seda Hancer', returning: true, level: 'Level 3', trainingCompletion: { start: true, academicPartnership: true, generalNotes: true } },
+  { id: 'ethan-brooks', name: 'Morgan Adams', iNumber: '700000004', email: 'ebrooks@byui.edu', phone: '(208) 496-6620', hiringAssistant: 'Cristian Velasquez', supervisor: 'Seda Hancer', returning: true, level: 'Level 2', trainingCompletion: { start: true, academicPartnership: false, generalNotes: false } },
+  { id: 'sofia-martinez', name: 'Riley Adams', iNumber: '700000005', email: 'smartinez@byui.edu', phone: '(208) 496-3908', hiringAssistant: 'Josh Whitman', supervisor: 'Laurin Vasquez', returning: false, level: 'Level 1' },
+  { id: 'noah-williams', name: 'Cameron Adams', iNumber: '700000006', email: 'nwilliams@byui.edu', phone: '(208) 496-5519', hiringAssistant: 'Emmanuel Otieno', supervisor: 'Seda Hancer', returning: true, level: 'Level 3', trainingCompletion: { start: true, academicPartnership: true, generalNotes: true } },
   {
     id: 'jordan-park',
-    name: 'Jordan Park',
+    name: 'Parker Adams',
+    iNumber: '700000007',
     email: 'jpark@byui.edu',
     phone: '(208) 496-8842',
     hiringAssistant: 'Josh Whitman',
@@ -65,7 +68,7 @@ function seededRandom(seed) {
 }
 
 function buildProfile(person, index) {
-  const { assignmentPlan, trainingCompletion, ...personDetails } = person
+  const { assignmentPlan, trainingCompletion, iNumber, ...personDetails } = person
   const random = seededRandom(1049 + index * 317)
   const assignments = assignmentPlan
     ? assignmentPlan.map((assignment, offset) => ({
@@ -101,7 +104,7 @@ function buildProfile(person, index) {
   return {
     ...personDetails,
     role: 'Teaching Assistant',
-    iNumber: `12${String(3456789 + index * 7319).padStart(7, '0')}`,
+    iNumber,
     workdayId: `W000${123456789 + index * 48217}`,
     assignments,
     workdayData,
@@ -109,7 +112,7 @@ function buildProfile(person, index) {
     trainingCompletion: trainingCompletion ?? defaultTrainingCompletion,
     notes: personDetails.id === 'jordan-park'
       ? [
-        { id: `${personDetails.id}-1`, category: 'Performance Review', author: personDetails.supervisor, content: 'Jordan supports three 6-hour sections this term. Workday reports one combined weekly total, not hours per course.', createdAt: '2026-06-03T16:00:00.000Z', updatedAt: '2026-06-03T16:00:00.000Z', week: 1 },
+        { id: `${personDetails.id}-1`, category: 'Performance Review', author: personDetails.supervisor, content: 'Parker supports three 6-hour sections this term. Workday reports one combined weekly total, not hours per course.', createdAt: '2026-06-03T16:00:00.000Z', updatedAt: '2026-06-03T16:00:00.000Z', week: 1 },
         { id: `${personDetails.id}-2`, category: 'Hiring Team', author: personDetails.hiringAssistant, content: 'Confirmed the 18-hour weekly expectation across ENG 101, COMM 130, and REL 200C.', createdAt: '2026-06-09T16:00:00.000Z', updatedAt: '2026-06-09T16:00:00.000Z', week: 2 },
       ]
       : [

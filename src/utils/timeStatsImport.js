@@ -1,12 +1,13 @@
 export const TIME_STATS_SHEETS = {
-  total_hours: ['i_number', 'max_assigned_hours', 'total_hours_worked', 'difference', 'status'],
-  manual_entries: ['i_number', 'percentage_manual', 'hours_inputted', 'times_inputted', 'user_or_mobile_entries'],
-  above_21hrs: ['i_number', 'total_hr', 'max_assigned_hours', 'over_assignment_by_1hr'],
-  pacing_report: ['i_number', 'days_under_25_minutes'],
-  unsubmitted_hrs: ['i_number', 'total_hr', 'status'],
-  over_8hrs: ['i_number', 'date', 'daily_hours'],
-  no_hrs: ['i_number'],
+  total_hours: ['i_number', 'ta_name', 'max_assigned_hours', 'total_hours_worked', 'difference', 'status'],
+  manual_entries: ['i_number', 'ta_name', 'percentage_manual', 'hours_inputted', 'times_inputted', 'user_or_mobile_entries'],
+  above_21hrs: ['i_number', 'ta_name', 'total_hr', 'max_assigned_hours', 'over_assignment_by_1hr'],
+  pacing_report: ['i_number', 'ta_name', 'days_under_25_minutes'],
+  over_8hrs: ['i_number', 'ta_name', 'date', 'daily_hours'],
+  no_hrs: ['i_number', 'ta_name'],
 }
+
+const IGNORED_SHEETS = ['unsubmitted_hrs']
 
 const REQUIRED_SHEETS = ['total_hours']
 const numericFields = new Set([
@@ -56,7 +57,7 @@ export function parseTimeStatsRows(workbookRows, { fileName = '', profiles = [] 
   const warnings = []
   const availableSheets = Object.keys(workbookRows).filter(name => TIME_STATS_SHEETS[name])
   const missingSheets = Object.keys(TIME_STATS_SHEETS).filter(name => !availableSheets.includes(name))
-  const unsupportedSheets = Object.keys(workbookRows).filter(name => !TIME_STATS_SHEETS[name])
+  const unsupportedSheets = Object.keys(workbookRows).filter(name => !TIME_STATS_SHEETS[name] && !IGNORED_SHEETS.includes(name))
 
   if (!availableSheets.length) errors.push('This workbook is not a recognizable Time Stats report.')
   for (const sheet of REQUIRED_SHEETS) if (!availableSheets.includes(sheet)) errors.push(`Required sheet “${sheet}” is missing.`)
@@ -94,10 +95,12 @@ export function parseTimeStatsRows(workbookRows, { fileName = '', profiles = [] 
 
   const allINumbers = [...new Set(Object.values(sheets).flat().map(row => row.i_number))]
   const profilesByINumber = new Map(profiles.map(profile => [normalizeINumber(profile.iNumber), profile]))
-  const matched = allINumbers.flatMap(iNumber => profilesByINumber.has(iNumber) ? [{ iNumber, profileId: profilesByINumber.get(iNumber).id, name: profilesByINumber.get(iNumber).name }] : [])
+  const namesByINumber = new Map()
+  for (const row of Object.values(sheets).flat()) if (row.ta_name && !namesByINumber.has(row.i_number)) namesByINumber.set(row.i_number, row.ta_name)
+  const matched = allINumbers.flatMap(iNumber => profilesByINumber.has(iNumber) ? [{ iNumber, profileId: profilesByINumber.get(iNumber).id, name: namesByINumber.get(iNumber) ?? profilesByINumber.get(iNumber).name }] : [])
   const unmatched = allINumbers.filter(iNumber => !profilesByINumber.has(iNumber)).map(iNumber => {
     const source = Object.values(sheets).flat().find(row => row.i_number === iNumber)
-    return { iNumber, name: source?.name ?? null }
+    return { iNumber, name: namesByINumber.get(iNumber) ?? source?.ta_name ?? null }
   })
 
   return {
@@ -118,17 +121,20 @@ export function parseTimeStatsRows(workbookRows, { fileName = '', profiles = [] 
 export function buildImportedWorkdayRecord(parsed, iNumber, week) {
   const id = normalizeINumber(iNumber)
   const find = sheet => parsed.sheets[sheet]?.find(row => row.i_number === id)
-  const total = find('total_hours')
-  if (!total) return null
+  const totalRows = parsed.sheets.total_hours?.filter(row => row.i_number === id) ?? []
+  if (!totalRows.length) return null
+  const total = totalRows[0]
+  const expectedHours = totalRows.reduce((sum, row) => sum + (row.max_assigned_hours ?? 0), 0)
+  const workedHours = total.total_hours_worked
+  const difference = workedHours == null ? null : Number((workedHours - expectedHours).toFixed(2))
   const manual = find('manual_entries')
   const pacing = find('pacing_report')
-  const unsubmitted = find('unsubmitted_hrs')
   return {
     week,
-    expectedHours: total.max_assigned_hours,
-    workedHours: total.total_hours_worked,
-    difference: total.difference,
-    importedStatus: total.status,
+    expectedHours,
+    workedHours,
+    difference,
+    importedStatus: difference == null ? total.status : difference > 0 ? 'Over' : difference < 0 ? 'Under' : 'Within',
     manualEntryPercentage: manual?.percentage_manual ?? null,
     manualEntryHours: manual?.hours_inputted ?? null,
     manualEntryCount: manual?.times_inputted ?? null,
@@ -138,19 +144,20 @@ export function buildImportedWorkdayRecord(parsed, iNumber, week) {
     aboveAssignedThreshold: Boolean(find('above_21hrs')),
     noHours: Boolean(find('no_hrs')),
     overEightHourDays: parsed.sheets.over_8hrs?.filter(row => row.i_number === id) ?? [],
-    unsubmittedHours: unsubmitted ? { totalHours: unsubmitted.total_hr, status: unsubmitted.status } : null,
-    unsubmittedHoursAvailable: Boolean(unsubmitted),
     importedAt: new Date().toISOString(),
     sourceFile: parsed.fileName,
   }
 }
 
 export function summarizeImportedWeek(parsed, supervisedCount) {
-  const totals = parsed.sheets.total_hours ?? []
+  const supervised = new Set(parsed.matched.map(row => row.iNumber))
+  const totals = (parsed.sheets.total_hours ?? []).filter(row => supervised.has(row.i_number))
   const assigned = totals.reduce((sum, row) => sum + (row.max_assigned_hours ?? 0), 0)
-  const worked = totals.reduce((sum, row) => sum + (row.total_hours_worked ?? 0), 0)
-  const pacingCount = new Set((parsed.sheets.pacing_report ?? []).map(row => row.i_number)).size
-  const manualRows = parsed.sheets.manual_entries ?? []
+  const workedByTA = new Map()
+  for (const row of totals) if (!workedByTA.has(row.i_number)) workedByTA.set(row.i_number, row.total_hours_worked ?? 0)
+  const worked = [...workedByTA.values()].reduce((sum, value) => sum + value, 0)
+  const pacingCount = new Set((parsed.sheets.pacing_report ?? []).filter(row => supervised.has(row.i_number)).map(row => row.i_number)).size
+  const manualRows = (parsed.sheets.manual_entries ?? []).filter(row => supervised.has(row.i_number))
   return {
     hoursUtilization: assigned ? worked / assigned * 100 : null,
     pacingMissing: supervisedCount ? pacingCount / supervisedCount * 100 : null,

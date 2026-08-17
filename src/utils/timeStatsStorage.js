@@ -18,12 +18,14 @@ export function saveTimeStatsImport(week, data, { replace = false, storage = loc
 
 export function applyTimeStatsImports(profiles, imports) {
   return profiles.map(profile => {
-    const importedRecords = Object.values(imports).flatMap(entry => {
+    const entries = Object.values(imports).sort((a, b) => a.week - b.week)
+    const importedRecords = entries.flatMap(entry => {
       const record = entry.records?.[profile.id]
       return record ? [record] : []
     })
     if (!importedRecords.length) return profile
     const importedWeeks = new Set(importedRecords.map(record => record.week))
-    return { ...profile, workdayData: [...profile.workdayData.filter(record => !importedWeeks.has(record.week)), ...importedRecords].sort((a, b) => a.week - b.week) }
+    const importedName = entries.flatMap(entry => entry.matched ?? []).filter(match => match.profileId === profile.id && match.name).at(-1)?.name
+    return { ...profile, name: importedName ?? profile.name, workdayData: [...profile.workdayData.filter(record => !importedWeeks.has(record.week)), ...importedRecords].sort((a, b) => a.week - b.week) }
   })
 }
