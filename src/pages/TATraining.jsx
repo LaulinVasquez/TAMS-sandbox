@@ -2,7 +2,7 @@ import { useState } from 'react'
 import SupervisorTrainingView from '../components/training/SupervisorTrainingView'
 import TATrainingPlayer from '../components/training/TATrainingPlayer'
 
-export default function TATraining({ collapsed, profiles, onSelectProfile }) {
+export default function TATraining({ collapsed, profiles, onSelectProfile, initialStatusFilter = 'all' }) {
   const [mode, setMode] = useState('supervisor')
 
   return (
@@ -13,6 +13,7 @@ export default function TATraining({ collapsed, profiles, onSelectProfile }) {
             profiles={profiles}
             onSelectProfile={onSelectProfile}
             onPreviewTAView={() => setMode('ta')}
+            initialStatusFilter={initialStatusFilter}
           />
         ) : (
           <TATrainingPlayer onBack={() => setMode('supervisor')} />

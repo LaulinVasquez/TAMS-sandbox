@@ -1,10 +1,10 @@
 import { AlertTriangle, ArrowRight, BookOpenCheck, CheckCircle2, Search, UsersRound } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Card from '../ui/Card'
 import ProgressBar from '../ui/ProgressBar'
 import StatusBadge from '../profile/StatusBadge'
 import { teamTrainingSummary, trainingModules } from '../../data/training'
-import { filterProfilesByTrainingStatus, getOverdueTrainingModules, getTrainingProgress, getTrainingStatus } from '../../utils/training'
+import { filterProfilesByTrainingStatus, getDisplayTrainingStatus, getOverdueTrainingModules, getTrainingProgress } from '../../utils/training'
 
 const statusFilters = ['all', 'Overdue', 'Not started', 'In progress', 'Complete']
 const statusTone = {
@@ -16,9 +16,12 @@ const statusTone = {
 
 const formatDeadline = date => new Date(`${date}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 
-export default function SupervisorTrainingView({ profiles, onSelectProfile, onPreviewTAView }) {
+export default function SupervisorTrainingView({ profiles, onSelectProfile, onPreviewTAView, initialStatusFilter = 'all' }) {
   const [query, setQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState(initialStatusFilter)
+  useEffect(() => {
+    setStatusFilter(initialStatusFilter || 'all')
+  }, [initialStatusFilter])
   const sedaTeam = useMemo(() => profiles.filter(profile => profile.supervisor === 'Seda Hancer'), [profiles])
   const overdueByProfile = useMemo(() => new Map(sedaTeam.map(profile => [profile.id, getOverdueTrainingModules(profile.trainingCompletion)])), [sedaTeam])
   const overdueAssignments = useMemo(() => [...overdueByProfile.values()].reduce((total, modules) => total + modules.length, 0), [overdueByProfile])
@@ -109,7 +112,7 @@ export default function SupervisorTrainingView({ profiles, onSelectProfile, onPr
               {filtered.map(profile => {
                 const progress = getTrainingProgress(profile.trainingCompletion)
                 const overdueModules = overdueByProfile.get(profile.id) ?? []
-                const status = overdueModules.length ? 'Overdue' : getTrainingStatus(profile.trainingCompletion)
+                const status = getDisplayTrainingStatus(profile.trainingCompletion)
                 return (
                   <tr key={profile.id} className="border-t border-slate-100 hover:bg-slate-50">
                     <td className="px-5 py-4">

@@ -9,7 +9,7 @@ import { getCurrentSemesterWeek, toPerformanceWeek } from '../utils/weeklySchedu
 
 const roles = ['Supervisor', 'Administrator', 'Instructor']
 
-export default function Dashboard({ collapsed, profiles, onSelectProfile, onReviewHoursWatch }) {
+export default function Dashboard({ collapsed, profiles, onSelectProfile, onReviewHoursWatch, onSelectAction }) {
   const [roleIndex, setRoleIndex] = useState(0)
   const current = useMemo(() => getCurrentSemesterWeek(semesterConfig.startDate), [])
   const defaultWeek = current.week ?? 'T-2'
@@ -53,7 +53,7 @@ export default function Dashboard({ collapsed, profiles, onSelectProfile, onRevi
 
         <div className="mt-[26px] grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-[2.06fr_1fr_1fr_1fr]">
           <div className="lg:col-span-2 xl:col-span-1">
-            <ActionBoard />
+            <ActionBoard onSelectAction={onSelectAction} />
           </div>
           <WeeklyTaskScheduleCard
             viewingAs={roles[roleIndex]}

@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { filterProfilesByTrainingStatus, getOverdueTrainingModules, getTrainingProgress, getTrainingStatus } from '../src/utils/training.js'
+import { filterProfilesByTrainingStatus, getDisplayTrainingStatus, getOverdueTrainingModules, getTrainingProgress, getTrainingStatus } from '../src/utils/training.js'
 
 test('calculates training progress and status labels', () => {
   const completion = { start: true, academicPartnership: false, generalNotes: false }
@@ -25,4 +25,10 @@ test('identifies incomplete training modules after their deadlines', () => {
   assert.deepEqual(getOverdueTrainingModules(completion, new Date('2026-08-18T12:00:00')).map(module => module.id), ['start'])
   assert.deepEqual(getOverdueTrainingModules(completion, new Date('2026-08-22T12:00:00')).map(module => module.id), ['start', 'generalNotes'])
   assert.equal(getOverdueTrainingModules({ start: true, academicPartnership: true, generalNotes: true }, new Date('2026-09-01T12:00:00')).length, 0)
+})
+
+test('prefers overdue over in-progress for display status', () => {
+  const completion = { start: false, academicPartnership: true, generalNotes: false }
+  assert.equal(getDisplayTrainingStatus(completion, new Date('2026-08-18T12:00:00')), 'Overdue')
+  assert.equal(getDisplayTrainingStatus({ start: true, academicPartnership: true, generalNotes: true }, new Date('2026-09-01T12:00:00')), 'Complete')
 })

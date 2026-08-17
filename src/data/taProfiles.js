@@ -13,7 +13,7 @@ const people = [
       { course: 'REL 200C', section: '03', instructor: 'Prof. Allen', maxHours: 10 },
     ],
   },
-  { id: 'marcus-reed', name: 'Marcus Reed', email: 'mreed@byui.edu', phone: '(208) 496-2184', hiringAssistant: 'Emmanuel Otieno', supervisor: 'Seda Hancer', returning: false, level: 'Level 1', trainingCompletion: { start: false, academicPartnership: false, generalNotes: false } },
+  { id: 'marcus-reed', name: 'Marcus Reed', email: 'mreed@byui.edu', phone: '(208) 496-2184', hiringAssistant: 'Emmanuel Otieno', supervisor: 'Seda Hancer', returning: false, level: 'Level 1', trainingCompletion: { start: false, academicPartnership: false, generalNotes: false }, introCallComplete: false, addedToTeams: false },
   {
     id: 'priya-shah',
     name: 'Priya Shah',
@@ -29,7 +29,7 @@ const people = [
     ],
   },
   { id: 'ethan-brooks', name: 'Ethan Brooks', email: 'ebrooks@byui.edu', phone: '(208) 496-6620', hiringAssistant: 'Cristian Velasquez', supervisor: 'Seda Hancer', returning: true, level: 'Level 2', trainingCompletion: { start: true, academicPartnership: false, generalNotes: false } },
-  { id: 'sofia-martinez', name: 'Sofia Martinez', email: 'smartinez@byui.edu', phone: '(208) 496-3908', hiringAssistant: 'Josh Whitman', supervisor: 'Laurin Vasquez', returning: false, level: 'Level 1' },
+  { id: 'sofia-martinez', name: 'Sofia Martinez', email: 'smartinez@byui.edu', phone: '(208) 496-3908', hiringAssistant: 'Josh Whitman', supervisor: 'Laurin Vasquez', returning: false, level: 'Level 1', introCallComplete: false, addedToTeams: true },
   { id: 'noah-williams', name: 'Noah Williams', email: 'nwilliams@byui.edu', phone: '(208) 496-5519', hiringAssistant: 'Emmanuel Otieno', supervisor: 'Seda Hancer', returning: true, level: 'Level 3', trainingCompletion: { start: true, academicPartnership: true, generalNotes: true } },
   {
     id: 'jordan-park',
@@ -107,6 +107,8 @@ function buildProfile(person, index) {
     workdayData,
     onboarding,
     trainingCompletion: trainingCompletion ?? defaultTrainingCompletion,
+    introCallComplete: person.introCallComplete ?? random() > 0.14,
+    addedToTeams: person.addedToTeams ?? random() > 0.07,
     notes: personDetails.id === 'jordan-park'
       ? [
         { id: `${personDetails.id}-1`, category: 'Performance Review', author: personDetails.supervisor, content: 'Jordan supports three 6-hour sections this term. Workday reports one combined weekly total, not hours per course.', createdAt: '2026-06-03T16:00:00.000Z', updatedAt: '2026-06-03T16:00:00.000Z', week: 1 },
