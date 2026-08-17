@@ -1,20 +1,32 @@
 import { ArrowRight, Search, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Card from '../components/ui/Card'
 import StatusBadge from '../components/profile/StatusBadge'
 import { summarizeWorkdayPerformance, statusDetails } from '../utils/profileMetrics'
+import { getDisplayTrainingStatus } from '../utils/training'
 
-export default function TADirectory({ collapsed, profiles, onSelect, filterIds = null, filterLabel = null, onClearFilter }) {
-  const [query, setQuery] = useState('')
+const trainingTone = {
+  Complete: 'green',
+  'In progress': 'amber',
+  'Not started': 'red',
+  Overdue: 'red',
+}
+
+export default function TADirectory({ collapsed, profiles, onSelect, filterIds = null, filterLabel = null, onClearFilter, initialQuery = '' }) {
+  const [query, setQuery] = useState(initialQuery)
   const filtered = useMemo(() => {
     let list = profiles
-    if (filterIds?.length) list = list.filter(profile => filterIds.includes(profile.id))
+    if (filterIds) list = list.filter(profile => filterIds.includes(profile.id))
     if (query.trim()) {
       const normalized = query.toLowerCase()
       list = list.filter(profile => `${profile.name} ${profile.email} ${profile.assignments.map(item => item.course).join(' ')}`.toLowerCase().includes(normalized))
     }
     return list
   }, [profiles, filterIds, query])
+
+  useEffect(() => {
+    setQuery(initialQuery)
+  }, [initialQuery])
 
   return (
     <main className={`min-h-screen px-[31px] pb-16 pt-[130px] transition-all ${collapsed ? 'ml-16' : 'ml-56'}`}>
@@ -48,7 +60,7 @@ export default function TADirectory({ collapsed, profiles, onSelect, filterIds =
 
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[850px] text-left">
+            <table className="w-full min-w-[960px] text-left">
               <thead className="bg-slate-50">
                 <tr className="text-xs uppercase tracking-wide text-muted">
                   <th className="px-5 py-3">Teaching Assistant</th>
@@ -56,6 +68,7 @@ export default function TADirectory({ collapsed, profiles, onSelect, filterIds =
                   <th>Level</th>
                   <th>Assignments</th>
                   <th>Supervisor</th>
+                  <th>Training</th>
                   <th>Team status</th>
                   <th aria-label="Actions" />
                 </tr>
@@ -64,6 +77,7 @@ export default function TADirectory({ collapsed, profiles, onSelect, filterIds =
                 {filtered.map(profile => {
                   const metric = summarizeWorkdayPerformance(profile.workdayData)
                   const status = statusDetails(metric.score)
+                  const trainingStatus = getDisplayTrainingStatus(profile.trainingCompletion)
                   return (
                     <tr key={profile.id} className="border-t border-slate-100 hover:bg-slate-50">
                       <td className="px-5 py-4">
@@ -78,6 +92,9 @@ export default function TADirectory({ collapsed, profiles, onSelect, filterIds =
                       <td>{profile.level}</td>
                       <td>{profile.assignments.length} courses</td>
                       <td>{profile.supervisor}</td>
+                      <td>
+                        <StatusBadge tone={trainingTone[trainingStatus]}>{trainingStatus}</StatusBadge>
+                      </td>
                       <td>
                         <span className={`rounded border px-2 py-0.5 text-xs ${status.classes}`}>{status.label} ({metric.score}%)</span>
                       </td>

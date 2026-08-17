@@ -1,8 +1,8 @@
 export const actionItems = [
-  { label: 'Enrolled in Training', count: 38, total: 56, percentage: 68, caption: '68% enrolled', color: 'bg-blue-500' },
-  { label: 'Completed Training', count: 21, total: 56, percentage: 38, caption: '38% complete', color: 'bg-amber-400' },
-  { label: 'Intro Calls', count: 48, total: 56, percentage: 86, caption: '86% called', color: 'bg-emerald-500' },
-  { label: 'Added to MS Teams', count: 52, total: 56, percentage: 93, caption: '93% added', color: 'bg-emerald-500' },
+  { label: 'Enrolled in Training', count: 38, total: 56, percentage: 68, caption: '68% enrolled', color: 'bg-blue-500', destination: { view: 'ta-training', status: 'In progress' } },
+  { label: 'Completed Training', count: 21, total: 56, percentage: 38, caption: '38% complete', color: 'bg-amber-400', destination: { view: 'ta-training', status: 'Complete' } },
+  { label: 'Intro Calls', count: 48, total: 56, percentage: 86, caption: '86% called', color: 'bg-emerald-500', destination: { view: 'tas', flag: 'introCallComplete', label: 'Intro Calls' } },
+  { label: 'Added to MS Teams', count: 52, total: 56, percentage: 93, caption: '93% added', color: 'bg-emerald-500', destination: { view: 'tas', flag: 'addedToTeams', label: 'Added to MS Teams' } },
 ]
 
 export const weeklyPerformance = {

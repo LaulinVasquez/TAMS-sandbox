@@ -16,6 +16,11 @@ export function getTrainingStatus(completion = {}) {
   return 'In progress'
 }
 
+export function getDisplayTrainingStatus(completion = {}, referenceDate = new Date()) {
+  if (getOverdueTrainingModules(completion, referenceDate).length) return 'Overdue'
+  return getTrainingStatus(completion)
+}
+
 export function filterProfilesByTrainingStatus(profiles, status) {
   if (!status || status === 'all') return profiles
   return profiles.filter(profile => getTrainingStatus(profile.trainingCompletion) === status)
