@@ -1,4 +1,6 @@
-const STORAGE_KEY = 'tams-time-stats-imports-v1'
+// Start the updated demonstration with Week 12 unimported. Subsequent imports
+// continue to persist normally under this roster-aware storage version.
+const STORAGE_KEY = 'tams-time-stats-imports-v2'
 
 export function loadTimeStatsImports(storage = localStorage) {
   try { return JSON.parse(storage.getItem(STORAGE_KEY)) ?? {} } catch { return {} }

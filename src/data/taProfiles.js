@@ -1,63 +1,41 @@
-const people = [
-  {
-    id: 'hannah-cho',
-    name: 'Avery Adams',
-    iNumber: '700000001',
-    email: 'hcho@byui.edu',
-    phone: '(208) 496-4307',
-    hiringAssistant: 'Josh Whitman',
-    supervisor: 'Laurin Vasquez',
-    returning: true,
-    level: 'Level 3',
-    assignmentPlan: [
-      { course: 'ENG 101', section: '03', instructor: 'Dr. Smith', maxHours: 10 },
-      { course: 'REL 200C', section: '03', instructor: 'Prof. Allen', maxHours: 10 },
-    ],
-  },
-  { id: 'marcus-reed', name: 'Jordan Adams', iNumber: '700000002', email: 'mreed@byui.edu', phone: '(208) 496-2184', hiringAssistant: 'Emmanuel Otieno', supervisor: 'Seda Hancer', returning: false, level: 'Level 1', trainingCompletion: { start: false, academicPartnership: false, generalNotes: false } },
-  {
-    id: 'priya-shah',
-    name: 'Taylor Adams',
-    iNumber: '700000003',
-    email: 'pshah@byui.edu',
-    phone: '(208) 496-7741',
-    hiringAssistant: 'Alejandro Ramirez',
-    supervisor: 'Laurin Vasquez',
-    returning: true,
-    level: 'Level 2',
-    assignmentPlan: [
-      { course: 'BUS 210', section: '02', instructor: 'Dr. Carter', maxHours: 10 },
-      { course: 'BIO 180', section: '01', instructor: 'Prof. Nguyen', maxHours: 10 },
-    ],
-  },
-  { id: 'ethan-brooks', name: 'Morgan Adams', iNumber: '700000004', email: 'ebrooks@byui.edu', phone: '(208) 496-6620', hiringAssistant: 'Cristian Velasquez', supervisor: 'Seda Hancer', returning: true, level: 'Level 2', trainingCompletion: { start: true, academicPartnership: false, generalNotes: false } },
-  { id: 'sofia-martinez', name: 'Riley Adams', iNumber: '700000005', email: 'smartinez@byui.edu', phone: '(208) 496-3908', hiringAssistant: 'Josh Whitman', supervisor: 'Laurin Vasquez', returning: false, level: 'Level 1' },
-  { id: 'noah-williams', name: 'Cameron Adams', iNumber: '700000006', email: 'nwilliams@byui.edu', phone: '(208) 496-5519', hiringAssistant: 'Emmanuel Otieno', supervisor: 'Seda Hancer', returning: true, level: 'Level 3', trainingCompletion: { start: true, academicPartnership: true, generalNotes: true } },
-  {
-    id: 'jordan-park',
-    name: 'Parker Adams',
-    iNumber: '700000007',
-    email: 'jpark@byui.edu',
-    phone: '(208) 496-8842',
-    hiringAssistant: 'Josh Whitman',
-    supervisor: 'Seda Hancer',
-    returning: false,
-    level: 'Level 1',
-    assignmentPlan: [
-      { course: 'ENG 101', section: '05', instructor: 'Dr. Smith', maxHours: 6 },
-      { course: 'COMM 130', section: '04', instructor: 'Prof. Baker', maxHours: 6 },
-      { course: 'REL 200C', section: '02', instructor: 'Prof. Allen', maxHours: 6 },
-    ],
-    trainingCompletion: { start: true, academicPartnership: true, generalNotes: false },
-  },
+const reportRoster = [
+  ['700000001', 'Avery Adams', 11],
+  ['700000002', 'Jordan Adams', 6],
+  ['700000003', 'Taylor Adams', 5],
+  ['700000004', 'Morgan Adams', 6],
+  ['700000005', 'Riley Adams', 10],
+  ['700000006', 'Cameron Adams', 10],
+  ['700000007', 'Parker Adams', 10],
+  ['700000008', 'Quinn Adams', 7],
+  ['700000009', 'Reese Adams', 15],
+  ['700000010', 'Hayden Adams', 10],
+  ['700000011', 'Logan Adams', 9],
+  ['700000012', 'Casey Adams', 5],
+  ['700000013', 'Drew Adams', 20],
+  ['700000014', 'Skyler Adams', 5],
+  ['700000015', 'Emerson Adams', 20],
+  ['700000016', 'Rowan Adams', 12],
+  ['700000017', 'Finley Adams', 10],
+  ['700000018', 'Blake Adams', 10],
+  ['700000019', 'Dakota Adams', 5],
+  ['700000020', 'Jamie Adams', 15],
 ]
 
 const courses = [
-  ['ENG 101 03', 'Dr. Smith'], ['REL 200C 03', 'Prof. Allen'], ['BUS 210 02', 'Dr. Carter'],
-  ['BIO 180 01', 'Prof. Nguyen'], ['MATH 221 04', 'Dr. Jensen'], ['COMM 130 02', 'Prof. Baker'],
+  ['ENG 101', '03', 'Dr. Smith'],
+  ['REL 200C', '03', 'Prof. Allen'],
+  ['BUS 210', '02', 'Dr. Carter'],
+  ['BIO 180', '01', 'Prof. Nguyen'],
+  ['MATH 221', '04', 'Dr. Jensen'],
+  ['COMM 130', '02', 'Prof. Baker'],
 ]
 
-const assignedHourOptions = [3, 5, 10]
+const supervisors = ['Laurin Vasquez', 'Seda Hancer']
+const hiringAssistants = ['Josh Whitman', 'Emmanuel Otieno', 'Alejandro Ramirez', 'Cristian Velasquez']
+
+function slugify(value) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
 
 function seededRandom(seed) {
   let value = seed
@@ -67,62 +45,67 @@ function seededRandom(seed) {
   }
 }
 
-function buildProfile(person, index) {
-  const { assignmentPlan, trainingCompletion, iNumber, ...personDetails } = person
+function buildProfile([iNumber, name, maxAssignedHours], index) {
   const random = seededRandom(1049 + index * 317)
-  const assignments = assignmentPlan
-    ? assignmentPlan.map((assignment, offset) => ({
-      ...assignment,
-      status: offset === 0 ? person.level : `Level ${1 + Math.floor(random() * 3)}`,
-    }))
-    : [0, 1].map(offset => {
-      const [courseLabel, instructor] = courses[(index + offset) % courses.length]
-      const parts = courseLabel.split(' ')
-      const section = parts.pop()
-    return { course: parts.join(' '), section, instructor, status: offset === 0 ? person.level : `Level ${1 + Math.floor(random() * 3)}`, maxHours: assignedHourOptions[(index + offset) % assignedHourOptions.length] }
-    })
-  const expectedHours = assignments.reduce((sum, assignment) => sum + assignment.maxHours, 0)
-  const workdayData = Array.from({ length: 14 }, (_, weekIndex) => {
-    const workedHours = Number((expectedHours - 3.5 + random() * 6).toFixed(2))
+  const [course, section, instructor] = courses[index % courses.length]
+  const id = slugify(name)
+  const [firstName, lastName] = name.toLowerCase().split(' ')
+  const supervisor = supervisors[index % supervisors.length]
+  const hiringAssistant = hiringAssistants[index % hiringAssistants.length]
+  const level = `Level ${(index % 3) + 1}`
+
+  // Week 12 is deliberately absent. Importing Time Stats supplies its real data.
+  const workdayData = Array.from({ length: 11 }, (_, weekIndex) => {
+    const workedHours = Number((maxAssignedHours - 1.25 + random() * 2.5).toFixed(2))
     return {
       week: weekIndex + 1,
-      expectedHours,
+      expectedHours: maxAssignedHours,
       workedHours,
-      daysUnder25Minutes: random() > .72 ? Math.ceil(random() * 3) : 0,
-      manualEntryPercentage: Math.round(random() * 55),
+      daysUnder25Minutes: random() > .82 ? 1 : 0,
+      manualEntryPercentage: Math.round(random() * 25),
       syncedAt: `2026-${String(6 + Math.floor(weekIndex / 4)).padStart(2, '0')}-${String(3 + (weekIndex % 4) * 7).padStart(2, '0')}T17:00:00.000Z`,
     }
   })
+
   const onboardingLabels = ['Background Check', 'I-9 Verification', 'Direct Deposit Setup', 'Training Modules', 'Department Orientation']
-  const onboarding = onboardingLabels.map((step, stepIndex) => ({ step, status: stepIndex < 2 ? 'Complete' : random() > .55 ? 'Complete' : random() > .45 ? 'In Progress' : 'Pending' }))
-  const defaultTrainingCompletion = {
-    start: random() > 0.35,
-    academicPartnership: random() > 0.5,
-    generalNotes: random() > 0.55,
-  }
+  const onboarding = onboardingLabels.map((step, stepIndex) => ({
+    step,
+    status: stepIndex < 3 ? 'Complete' : random() > .45 ? 'Complete' : 'In Progress',
+  }))
 
   return {
-    ...personDetails,
-    role: 'Teaching Assistant',
+    id,
+    name,
     iNumber,
-    workdayId: `W000${123456789 + index * 48217}`,
-    assignments,
+    email: `${firstName}.${lastName}${String(index + 1).padStart(2, '0')}@byui.edu`,
+    phone: `(208) 496-${String(2100 + index * 137).slice(-4)}`,
+    hiringAssistant,
+    supervisor,
+    returning: index % 4 !== 1,
+    level,
+    role: 'Teaching Assistant',
+    workdayId: `W${String(123456789 + index * 48217).padStart(12, '0')}`,
+    assignments: [{ course, section, instructor, status: level, maxHours: maxAssignedHours }],
     workdayData,
     onboarding,
-    trainingCompletion: trainingCompletion ?? defaultTrainingCompletion,
-    notes: personDetails.id === 'jordan-park'
-      ? [
-        { id: `${personDetails.id}-1`, category: 'Performance Review', author: personDetails.supervisor, content: 'Parker supports three 6-hour sections this term. Workday reports one combined weekly total, not hours per course.', createdAt: '2026-06-03T16:00:00.000Z', updatedAt: '2026-06-03T16:00:00.000Z', week: 1 },
-        { id: `${personDetails.id}-2`, category: 'Hiring Team', author: personDetails.hiringAssistant, content: 'Confirmed the 18-hour weekly expectation across ENG 101, COMM 130, and REL 200C.', createdAt: '2026-06-09T16:00:00.000Z', updatedAt: '2026-06-09T16:00:00.000Z', week: 2 },
-      ]
-      : [
-        { id: `${personDetails.id}-1`, category: 'Performance Review', author: personDetails.supervisor, content: `${personDetails.name.split(' ')[0]} completed the initial check-in. Continue monitoring pacing and weekly hours.`, createdAt: '2026-06-03T16:00:00.000Z', updatedAt: '2026-06-03T16:00:00.000Z', week: 1 },
-        { id: `${personDetails.id}-2`, category: 'Call Summary', author: personDetails.hiringAssistant, content: 'Reviewed manual time entries and clarified the department logging expectations.', createdAt: '2026-06-09T16:00:00.000Z', updatedAt: '2026-06-09T16:00:00.000Z', week: 2 },
-      ],
+    trainingCompletion: {
+      start: random() > .2,
+      academicPartnership: random() > .35,
+      generalNotes: random() > .45,
+    },
+    notes: [{
+      id: `${id}-1`,
+      category: 'Performance Review',
+      author: supervisor,
+      content: `${name.split(' ')[0]}'s weekly performance is measured against the ${maxAssignedHours}-hour course assignment.`,
+      createdAt: '2026-06-03T16:00:00.000Z',
+      updatedAt: '2026-06-03T16:00:00.000Z',
+      week: 1,
+    }],
   }
 }
 
-export const taProfiles = people.map(buildProfile)
+export const taProfiles = reportRoster.map(buildProfile)
 
 export function getTAProfile(id) {
   return taProfiles.find(profile => profile.id === id)
