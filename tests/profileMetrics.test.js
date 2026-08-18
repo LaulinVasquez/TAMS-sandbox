@@ -61,20 +61,21 @@ test('flags TAs with Below Hours or more than assigned plus 0.5 hours', () => {
   assert.equal(alerts[1].reason, 'over-hours')
 })
 
-test('supports varied per-section hour allocations and derives weekly expected hours', () => {
+test('uses one course assignment per report TA and derives weekly expected hours', () => {
   const allocations = new Set(taProfiles.flatMap(profile => profile.assignments.map(assignment => assignment.maxHours)))
-  assert.ok([3, 5, 10].every(hours => allocations.has(hours)))
+  assert.equal(taProfiles.length, 20)
+  assert.ok([5, 10, 20].every(hours => allocations.has(hours)))
   assert.ok(allocations.size > 1)
   for (const profile of taProfiles) {
+    assert.equal(profile.assignments.length, 1)
     const assignedTotal = profile.assignments.reduce((sum, assignment) => sum + assignment.maxHours, 0)
     assert.ok(profile.workdayData.every(week => week.expectedHours === assignedTotal))
+    assert.equal(profile.workdayData.some(week => week.week === 12), false)
   }
 })
 
-test('supports two 10-hour sections in course assignments and performance records', () => {
-  for (const id of ['hannah-cho', 'priya-shah']) {
-    const profile = taProfiles.find(item => item.id === id)
-    assert.deepEqual(profile.assignments.map(assignment => assignment.maxHours), [10, 10])
-    assert.ok(profile.workdayData.every(week => week.expectedHours === 20))
-  }
+test('combines repeated report rows into the single seeded course allocation', () => {
+  const profile = taProfiles.find(item => item.iNumber === '700000001')
+  assert.deepEqual(profile.assignments.map(assignment => assignment.maxHours), [11])
+  assert.ok(profile.workdayData.every(week => week.expectedHours === 11))
 })

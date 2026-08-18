@@ -6,10 +6,11 @@ import PerformanceCard from '../components/dashboard/PerformanceCard'
 import SurveyCard from '../components/dashboard/SurveyCard'
 import { semesterConfig } from '../data/weeklyTaskSchedule'
 import { getCurrentSemesterWeek, toPerformanceWeek } from '../utils/weeklySchedule'
+import TimeStatsImport from '../components/dashboard/TimeStatsImport'
 
 const roles = ['Supervisor', 'Administrator', 'Instructor']
 
-export default function Dashboard({ collapsed, profiles, onSelectProfile, onReviewHoursWatch, onSelectAction }) {
+export default function Dashboard({ collapsed, profiles, timeStatsImports, onImportTimeStats, onSelectProfile, onReviewHoursWatch, onSelectAction }) {
   const [roleIndex, setRoleIndex] = useState(0)
   const current = useMemo(() => getCurrentSemesterWeek(semesterConfig.startDate), [])
   const defaultWeek = current.week ?? 'T-2'
@@ -27,12 +28,13 @@ export default function Dashboard({ collapsed, profiles, onSelectProfile, onRevi
   return (
     <main className={`min-h-screen px-[31px] pb-16 pt-[130px] transition-all ${collapsed ? 'ml-16' : 'ml-56'}`}>
       <div className="mx-auto max-w-[1291px]">
-        <header className="flex items-start justify-between">
+        <header className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="mt-1 text-[25px] font-bold leading-none">My team this term</h1>
             <p className="mt-2 text-[13px] text-slate-500">Online TAs · Fall 2026 ·</p>
           </div>
-          <div className="hidden items-center gap-3 lg:flex">
+          <TimeStatsImport profiles={profiles} existingWeeks={Object.keys(timeStatsImports).map(Number)} onImport={onImportTimeStats} />
+          <div className="hidden items-center gap-3 xl:flex">
             <span className="section-label font-semibold">Term</span>
             <select className="h-9 min-w-[158px] rounded border border-slate-300 bg-white px-3">
               <option>Fall 2026 · default</option>
@@ -70,7 +72,7 @@ export default function Dashboard({ collapsed, profiles, onSelectProfile, onRevi
           />
         </div>
 
-        <PerformanceCard selectedWeek={performanceWeek} onWeekChange={handlePerformanceWeekChange} />
+        <PerformanceCard selectedWeek={performanceWeek} onWeekChange={handlePerformanceWeekChange} importedSummary={timeStatsImports[performanceWeek]?.summary} />
       </div>
     </main>
   )

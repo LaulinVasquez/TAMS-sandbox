@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Sidebar from './components/layout/Sidebar'
 import Topbar from './components/layout/Topbar'
 import { getTAProfile, taProfiles } from './data/taProfiles'
@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard'
 import TADirectory from './pages/TADirectory'
 import TAProfile from './pages/TAProfile'
 import TATraining from './pages/TATraining'
+import { buildImportedWorkdayRecord, summarizeImportedWeek } from './utils/timeStatsImport'
+import { applyTimeStatsImports, loadTimeStatsImports, saveTimeStatsImport } from './utils/timeStatsStorage'
 import { filterProfilesByFlag } from './utils/profiles'
 
 export default function App() {
@@ -19,6 +21,8 @@ export default function App() {
   const [directoryFilter, setDirectoryFilter] = useState(null)
   const [directoryQuery, setDirectoryQuery] = useState('')
   const [trainingStatusFilter, setTrainingStatusFilter] = useState('all')
+  const [timeStatsImports, setTimeStatsImports] = useState(() => loadTimeStatsImports())
+  const profiles = useMemo(() => applyTimeStatsImports(taProfiles, timeStatsImports), [timeStatsImports])
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
@@ -63,59 +67,35 @@ export default function App() {
     if (destination.view === 'tas') {
       setDirectoryQuery('')
       setDirectoryFilter({
-        ids: filterProfilesByFlag(taProfiles, destination.flag).map(profile => profile.id),
+        ids: filterProfilesByFlag(profiles, destination.flag).map(profile => profile.id),
         label: destination.label,
       })
       setView('tas')
     }
   }
 
+  const importTimeStats = (parsed, week, replace) => {
+    const records = Object.fromEntries(parsed.matched.map(match => [match.profileId, buildImportedWorkdayRecord(parsed, match.iNumber, week)]).filter(([, record]) => record))
+    saveTimeStatsImport(week, {
+      fileName: parsed.fileName, sheets: parsed.sheets, availableSheets: parsed.availableSheets,
+      missingSheets: parsed.missingSheets, matched: parsed.matched, unmatched: parsed.unmatched,
+      recordCount: parsed.recordCount, records, summary: summarizeImportedWeek(parsed, profiles.length),
+    }, { replace })
+    setTimeStatsImports(loadTimeStatsImports())
+  }
+
   if (view === 'profile') {
-    return <TAProfile profile={getTAProfile(selectedTA)} onBack={() => setView('tas')} onDashboard={() => setView('dashboard')} />
+    return <TAProfile profile={profiles.find(profile => profile.id === selectedTA) ?? getTAProfile(selectedTA)} onBack={() => setView('tas')} onDashboard={() => setView('dashboard')} />
   }
 
   return (
     <div className="min-h-screen border-t-[3px] border-neutral-800 bg-surface text-ink transition-colors">
       <Sidebar activeView={view} collapsed={collapsed} onNavigate={handleNavigate} onToggle={() => setCollapsed(value => !value)} />
-      <Topbar
-        collapsed={collapsed}
-        darkMode={darkMode}
-        onToggleTheme={() => setDarkMode(value => !value)}
-        profiles={taProfiles}
-        onSelectProfile={openProfile}
-        onViewAllResults={openDirectorySearch}
-      />
-      <div className={`fixed right-0 top-[62px] z-30 flex h-9 items-center justify-center bg-brand text-xs text-white transition-all ${collapsed ? 'left-16' : 'left-56'}`}>
-        <strong>Wireframe preview</strong>&nbsp;· stakeholder review only · use the role switcher to compare layouts
-      </div>
-      {view === 'dashboard' && (
-        <Dashboard
-          collapsed={collapsed}
-          profiles={taProfiles}
-          onSelectProfile={openProfile}
-          onReviewHoursWatch={openHoursWatchList}
-          onSelectAction={handleActionSelect}
-        />
-      )}
-      {view === 'tas' && (
-        <TADirectory
-          collapsed={collapsed}
-          profiles={taProfiles}
-          onSelect={openProfile}
-          filterIds={directoryFilter?.ids}
-          filterLabel={directoryFilter?.label}
-          onClearFilter={() => setDirectoryFilter(null)}
-          initialQuery={directoryQuery}
-        />
-      )}
-      {view === 'ta-training' && (
-        <TATraining
-          collapsed={collapsed}
-          profiles={taProfiles}
-          onSelectProfile={openProfile}
-          initialStatusFilter={trainingStatusFilter}
-        />
-      )}
+      <Topbar collapsed={collapsed} darkMode={darkMode} onToggleTheme={() => setDarkMode(value => !value)} profiles={profiles} onSelectProfile={openProfile} onViewAllResults={openDirectorySearch} />
+      <div className={`fixed right-0 top-[62px] z-30 flex h-9 items-center justify-center bg-brand text-xs text-white transition-all ${collapsed ? 'left-16' : 'left-56'}`}><strong>Wireframe preview</strong>&nbsp;· stakeholder review only · use the role switcher to compare layouts</div>
+      {view === 'dashboard' && <Dashboard collapsed={collapsed} profiles={profiles} timeStatsImports={timeStatsImports} onImportTimeStats={importTimeStats} onSelectProfile={openProfile} onReviewHoursWatch={openHoursWatchList} onSelectAction={handleActionSelect} />}
+      {view === 'tas' && <TADirectory collapsed={collapsed} profiles={profiles} onSelect={openProfile} filterIds={directoryFilter?.ids} filterLabel={directoryFilter?.label} onClearFilter={() => setDirectoryFilter(null)} initialQuery={directoryQuery} />}
+      {view === 'ta-training' && <TATraining collapsed={collapsed} profiles={profiles} onSelectProfile={openProfile} initialStatusFilter={trainingStatusFilter} />}
       <button aria-label="Open help" className="fixed bottom-3 right-3 grid size-[34px] place-items-center rounded-full border-2 border-neutral-500 bg-neutral-800 text-xl text-white shadow-md">?</button>
     </div>
   )
