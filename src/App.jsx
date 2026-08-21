@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard'
 import TADirectory from './pages/TADirectory'
 import TAProfile from './pages/TAProfile'
 import TATraining from './pages/TATraining'
+import Courses from './pages/Courses'
+import CourseDetail from './pages/CourseDetail'
 import { buildImportedWorkdayRecord, summarizeImportedWeek } from './utils/timeStatsImport'
 import { applyTimeStatsImports, loadTimeStatsImports, saveTimeStatsImport } from './utils/timeStatsStorage'
 import { filterProfilesByFlag } from './utils/profiles'
@@ -18,6 +20,7 @@ export default function App() {
   })
   const [view, setView] = useState('dashboard')
   const [selectedTA, setSelectedTA] = useState(taProfiles[0].id)
+  const [selectedCourse, setSelectedCourse] = useState(null)
   const [directoryFilter, setDirectoryFilter] = useState(null)
   const [directoryQuery, setDirectoryQuery] = useState('')
   const [trainingStatusFilter, setTrainingStatusFilter] = useState('all')
@@ -88,6 +91,10 @@ export default function App() {
     return <TAProfile profile={profiles.find(profile => profile.id === selectedTA) ?? getTAProfile(selectedTA)} onBack={() => setView('tas')} onDashboard={() => setView('dashboard')} />
   }
 
+  if (view === 'course-detail') {
+    return <div className="min-h-screen border-t-[3px] border-neutral-800 bg-surface text-ink"><Sidebar activeView="courses" collapsed={collapsed} onNavigate={handleNavigate} onToggle={() => setCollapsed(value => !value)} /><Topbar collapsed={collapsed} darkMode={darkMode} onToggleTheme={() => setDarkMode(value => !value)} profiles={profiles} onSelectProfile={openProfile} onViewAllResults={openDirectorySearch} /><CourseDetail courseId={selectedCourse} collapsed={collapsed} onBack={() => setView('courses')} /><button aria-label="Open help" className="fixed bottom-3 right-3 grid size-[34px] place-items-center rounded-full border-2 border-neutral-500 bg-neutral-800 text-xl text-white shadow-md">?</button></div>
+  }
+
   return (
     <div className="min-h-screen border-t-[3px] border-neutral-800 bg-surface text-ink transition-colors">
       <Sidebar activeView={view} collapsed={collapsed} onNavigate={handleNavigate} onToggle={() => setCollapsed(value => !value)} />
@@ -96,6 +103,7 @@ export default function App() {
       {view === 'dashboard' && <Dashboard collapsed={collapsed} profiles={profiles} timeStatsImports={timeStatsImports} onImportTimeStats={importTimeStats} onSelectProfile={openProfile} onReviewHoursWatch={openHoursWatchList} onSelectAction={handleActionSelect} />}
       {view === 'tas' && <TADirectory collapsed={collapsed} profiles={profiles} onSelect={openProfile} filterIds={directoryFilter?.ids} filterLabel={directoryFilter?.label} onClearFilter={() => setDirectoryFilter(null)} initialQuery={directoryQuery} />}
       {view === 'ta-training' && <TATraining collapsed={collapsed} profiles={profiles} onSelectProfile={openProfile} initialStatusFilter={trainingStatusFilter} />}
+      {view === 'courses' && <Courses collapsed={collapsed} onSelect={id => { setSelectedCourse(id); setView('course-detail') }} />}
       <button aria-label="Open help" className="fixed bottom-3 right-3 grid size-[34px] place-items-center rounded-full border-2 border-neutral-500 bg-neutral-800 text-xl text-white shadow-md">?</button>
     </div>
   )
