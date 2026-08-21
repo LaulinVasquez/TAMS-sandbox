@@ -1,177 +1,234 @@
-# Agent Task — Update Courses UI to Match Reference Screenshots
+# Agent Task — Update TA Plan Job Information Fields
 
 ## Goal
 
-Update the **Courses** section in the TAMS template so it closely matches the existing TAMS design shown in the reference screenshots located in the repository's `images` folder.
+Update the **TA Plan** section on the Course Detail page to match the new job-information requirements.
 
-The screenshots are already available in the TAMS sandbox repo and their filenames begin with:
+Use the existing Course Detail implementation and styling. Do not redesign the page. The new fields should visually match the cards, text areas, inputs, spacing, and typography already used throughout TAMS.
 
-* `courses...`
-* `course...`
-
-The agent should inspect those screenshots directly and use them as the primary visual reference.
+Use the provided reference screenshot/template for the expected content and field organization.
 
 ---
 
-## Courses List Page
+## Required Fields
 
-When the user clicks **Courses** in the left navigation, recreate the page shown in the `courses...` reference screenshot as closely as possible.
+Replace the existing Details fields with the following fields in this order:
 
-The page should include the same overall structure:
+1. **Position Requirements**
+2. **Job Description**
+3. **Job Duties**
+4. **Job Expectations**
+5. **Supplemental Training and/or Required Certificate**
 
-* Page title: **Courses**
-* Supporting description below the title
-* Search input
-* Course count
-* Filter control
-* Export control
-* View control
-* Course table
+Remove/replace the old labels:
 
-The table should include fields similar to:
-
-* Course
-* Name
-* Department
-* Status
-* Sections
-* Unassigned
-* Notes
-
-Each course row should be clickable and open the corresponding course detail page.
-
-Match the reference UI closely in:
-
-* spacing
-* card borders
-* table density
-* typography hierarchy
-* button sizing
-* alignment
-* status badges
-* sidebar/content spacing
-
-Reuse the existing TAMS design system and components wherever possible rather than creating a separate visual system.
+* `Required Skills / Job Posting` → **Job Description**
+* `Setup Instructions` → **Position Requirements**
+* Replace the current supplementary training label with **Supplemental Training and/or Required Certificate**
 
 ---
 
-## Course Detail Page
+## 1. Position Requirements
 
-When a user selects a course, recreate the layout shown in the `course...` screenshots.
+Create a text area titled:
 
-The top of the page should include:
+**POSITION REQUIREMENTS**
 
-* Course code
-* Course name
-* Department information
+This field appears **above Job Description**.
 
-Create cards/sections similar to the references.
+This is course-specific content and should remain editable.
 
-### Course Summary
-
-Display information such as:
-
-* Status
-* Sections
-* Unassigned
-* TA Plan status
-* TAP weekly hours
-
-### Course Notes
-
-Create a persistent notes card similar to the reference.
-
-Include:
-
-* Note textarea/input
-* Staff-only checkbox
-* Add note button
-* Existing notes area
-
-The visual styling should closely follow the screenshot.
-
-### Resources
-
-Add the Resources section shown in the reference with the same general layout.
-
-### TA Plan
-
-Create the TA Plan section using the reference screenshots as the UI target.
-
-The section should support:
-
-* Weekly duties
-* Responsibility selection
-* Description field
-* Hours/week
-* Add weekly duty
-* Remove duty
-* Non-regular duties
-* Add non-regular duty
-
-### Details
-
-Include the same detail areas shown in the reference:
-
-* Required Skills / Job Posting
-* Supplementary Training
-* Setup Instructions
-* Required Certifications
-
-Provide:
-
-* Save
-* Submit for approval
-* History
-
-### Sections This Term
-
-Include the final **Sections This Term** card/section shown in the reference.
+Do not add default template text to this field.
 
 ---
 
-## Visual Requirements
+## 2. Job Description
 
-The screenshots in the `images` folder are the primary design source.
+Create a text area titled:
 
-The agent should inspect the images whose names begin with `course` or `courses` before implementing.
+**JOB DESCRIPTION**
 
-Do not redesign the page based on personal preference.
+Pre-populate new TA Plans with this template:
 
-The goal is to make the current TAMS template look and behave **very close to the reference implementation**, including:
+> An online teaching assistant (TA) is needed for **[Course Code: Course Title]**. TAs work remotely and support instructors and students under supervision of the Online TA Management Team.
+>
+> **Note:** Qualified applicants remain on interest lists for multiple semesters and may be contacted as openings arise.
 
-* layout
-* proportions
-* spacing
-* borders
-* controls
-* tables
-* cards
-* typography
-* navigation behavior
+`[Course Code: Course Title]` should not remain static if course information is already available.
 
-Pixel-perfect matching is not required, but the result should clearly look like the same application.
+For example, for ANTH 101:
 
----
+> An online teaching assistant (TA) is needed for **ANTH 101: Introduction to Cultural Anthropology**.
 
-## Implementation Requirements
+Use the selected course's actual course code and title when generating the default template.
 
-Before changing code:
-
-1. Inspect the existing Courses routes/components.
-2. Inspect the screenshots in the repository `images` folder.
-3. Reuse existing TAMS components and styles when possible.
-4. Keep the implementation responsive.
-5. Preserve existing functionality unless a change is required to match the reference.
-6. Avoid hardcoding the entire page if reusable data/components already exist.
-7. Keep course list data and course detail data structured so real backend data can replace placeholders later.
+The supervisor must still be able to edit the text.
 
 ---
 
-## Scope
+## 3. Job Duties
 
-For this task, focus only on reproducing the **Courses list page and Course detail page** shown in the screenshots.
+Create a text area titled:
 
-Do not implement the Time Stats import feature yet.
+**JOB DUTIES**
 
-Once the Courses UI is aligned with the reference design, the next ticket/update will build on top of this structure.
+This is course-specific information.
+
+Leave the field blank by default so the appropriate person can enter the duties for that course.
+
+---
+
+## 4. Job Expectations
+
+Create a text area titled:
+
+**JOB EXPECTATIONS**
+
+Pre-populate new TA Plans with the following template:
+
+**General TA Job Expectations (non-negotiable, click here for additional detail)**
+
+* 14-week commitment
+* Must work 30 minutes/day (minimum), 5 days/week (excluding Sundays)
+* Time off is limited to 3 consecutive days (with management approval)
+* All work must be completed in Idaho
+
+The text should remain editable.
+
+If the existing application already has an appropriate destination for the **"click here for additional detail"** link, use it. Otherwise preserve the text without inventing a URL.
+
+---
+
+## 5. Supplemental Training and/or Required Certificate
+
+Create a section titled:
+
+**SUPPLEMENTAL TRAINING AND/OR REQUIRED CERTIFICATE**
+
+Add a dropdown:
+
+**Requires certification**
+
+Options:
+
+* No
+* Yes
+
+Default:
+
+**No**
+
+### When "No" is selected
+
+Do not display the additional description text area.
+
+### When "Yes" is selected
+
+Dynamically display a text area underneath the dropdown where the user can describe:
+
+* Required certification
+* Required supplemental training
+* Course-specific training/certification details
+
+The entered description must be preserved when the TA Plan is saved.
+
+If the user changes **Yes → No**, hide the description field. Do not unexpectedly destroy previously entered data unless the existing application's form conventions require clearing it.
+
+---
+
+## Expected Layout
+
+The Details portion of the TA Plan should conceptually become:
+
+```text
+DETAILS
+
+POSITION REQUIREMENTS
+[ Text Area ]
+
+JOB DESCRIPTION
+[ Text Area with default Job Description template ]
+
+JOB DUTIES
+[ Text Area ]
+
+JOB EXPECTATIONS
+[ Text Area with default Job Expectations template ]
+
+SUPPLEMENTAL TRAINING AND/OR REQUIRED CERTIFICATE
+
+Requires certification
+[ No ▼ ]
+
+If Yes:
+
+Certification / Training Description
+[ Text Area ]
+```
+
+Keep these fields inside the existing TA Plan card rather than creating unrelated cards/pages.
+
+---
+
+## Template Behavior
+
+The Job Description and Job Expectations templates are intended to reduce repeated manual entry.
+
+For **new TA Plans**:
+
+* Automatically initialize Job Description with its template.
+* Automatically initialize Job Expectations with its template.
+* Automatically substitute the current course code and title into Job Description.
+* Position Requirements starts blank.
+* Job Duties starts blank.
+* Requires Certification defaults to `No`.
+
+For **existing TA Plans**, do not overwrite saved content just because the page is opened.
+
+Templates should act as initial values for new content, not continuously replace user edits.
+
+---
+
+## Persistence
+
+Inspect the existing TA Plan data model before implementation.
+
+These values must persist with the TA Plan:
+
+```text
+positionRequirements
+jobDescription
+jobDuties
+jobExpectations
+requiresCertification
+certificationDescription
+```
+
+Follow the project's existing naming conventions if equivalent fields already exist.
+
+Prefer migrating/reusing existing fields where appropriate instead of creating duplicate database columns containing the same information.
+
+The Save and Submit for Approval workflows must include these fields.
+
+---
+
+## Reference Material
+
+Use the reference screenshot provided for this task as the content/layout reference.
+
+Also continue using the existing `course...` and `courses...` screenshots in the repository's `images` folder for the overall Course Detail UI.
+
+The screenshot establishes the expected content for:
+
+* Job Description
+* Job Expectations
+* Position Requirements
+* Supplemental Training and/or Required Certificate
+
+---
+
+## Acceptance Criteria
+
+The task is complete when the Course TA Plan displays the five required sections in the correct order, the old labels have been replaced, Job Description and Job Expectations initialize from their templates, the current course is inserted into the Job Description, certification has a Yes/No dropdown with a conditional description field, all fields can be edited and saved, and existing TA Plan data is not unintentionally overwritten.
+
+Do not implement unrelated Courses or Time Stats changes as part of this task.

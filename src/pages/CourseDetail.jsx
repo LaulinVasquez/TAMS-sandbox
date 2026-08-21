@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { getCourse } from '../data/courses'
+import { loadCoursePlan, saveCoursePlan } from '../utils/coursePlan'
 
 const card = 'rounded-[11px] border border-slate-200 bg-white p-[18px]'
 const input = 'h-9 rounded-md border border-slate-300 bg-white px-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-200'
@@ -16,11 +17,21 @@ export default function CourseDetail({ courseId, collapsed, onBack }) {
   const [notes, setNotes] = useState(() => JSON.parse(localStorage.getItem(notesKey) || '[]'))
   const [duties, setDuties] = useState(dutiesSeed)
   const [nonRegular, setNonRegular] = useState([])
+  const [plan, setPlan] = useState(() => loadCoursePlan(course))
   const [saved, setSaved] = useState(false)
-  useEffect(() => setNotes(JSON.parse(localStorage.getItem(notesKey) || '[]')), [notesKey])
+  useEffect(() => {
+    setNotes(JSON.parse(localStorage.getItem(notesKey) || '[]'))
+    setPlan(loadCoursePlan(course))
+  }, [course, notesKey])
   const weeklyHours = useMemo(() => duties.reduce((sum, duty) => sum + Number(duty.hours || 0), 0), [duties])
   const updateDuty = (id, field, value) => setDuties(items => items.map(item => item.id === id ? { ...item, [field]: value } : item))
   const addNote = () => { if (!note.trim()) return; const next = [{ id: Date.now(), text: note.trim(), staffOnly, date: new Date().toLocaleDateString() }, ...notes]; setNotes(next); localStorage.setItem(notesKey, JSON.stringify(next)); setNote('') }
+  const updatePlan = (field, value) => setPlan(current => ({ ...current, [field]: value }))
+  const persistPlan = () => {
+    saveCoursePlan(course.id, plan)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 1800)
+  }
 
   return <main className={`min-h-screen px-8 pb-12 pt-[84px] transition-all ${collapsed ? 'ml-16' : 'ml-56'}`}>
     <div className="mx-auto max-w-[1536px] text-[13px]">
@@ -37,8 +48,13 @@ export default function CourseDetail({ courseId, collapsed, onBack }) {
         {duties.map(duty => <div key={duty.id} className="grid gap-2 border-b border-slate-100 py-2 lg:grid-cols-[1fr_1.05fr_90px_150px] lg:gap-4"><select className={input} value={duty.responsibility} onChange={e => updateDuty(duty.id, 'responsibility', e.target.value)}><option>Grading</option><option>StudentOutreach</option><option>Office Hours</option><option>Course Support</option></select><input aria-label="Duty description" className={input} value={duty.description} onChange={e => updateDuty(duty.id, 'description', e.target.value)}/><input aria-label="Hours per week" type="number" min="0" step="0.25" className={input} value={duty.hours} onChange={e => updateDuty(duty.id, 'hours', e.target.value)}/><button onClick={() => setDuties(items => items.filter(item => item.id !== duty.id))} className="text-brand hover:underline">Remove</button></div>)}
         <button onClick={() => setDuties(items => [...items, { id: Date.now(), responsibility: 'Grading', description: '', hours: 0 }])} className="mt-2 rounded-md border border-sky-600 px-3 py-1.5 font-semibold text-sky-700">+ Weekly duty</button>
         <h3 className="mb-2 mt-5 text-xs font-bold uppercase">Non-regular duties</h3>{nonRegular.length ? nonRegular.map(item => <div key={item.id} className="mb-2 flex gap-2"><input aria-label="Non-regular duty description" className={`${input} flex-1`} value={item.description} onChange={e => setNonRegular(rows => rows.map(row => row.id === item.id ? {...row, description:e.target.value}:row))}/><input aria-label="Non-regular duty hours" type="number" min="0" step="0.25" className={`${input} w-24`} value={item.hours} onChange={e => setNonRegular(rows => rows.map(row => row.id === item.id ? {...row, hours:e.target.value}:row))}/><button onClick={() => setNonRegular(rows => rows.filter(row => row.id !== item.id))} className="px-3 text-brand">Remove</button></div>) : <p>No non-regular duties yet.</p>}<button onClick={() => setNonRegular(items => [...items, {id:Date.now(), description:'', hours:0}])} className="mt-3 rounded-md border border-sky-600 px-3 py-1.5 font-semibold text-sky-700">+ Non-regular duty</button>
-        <h3 className="mb-2 mt-5 text-xs font-bold uppercase">Details</h3><label className="block text-xs uppercase">Required skills / job posting<textarea defaultValue={`An online Teaching Assistant (TA) is needed for ${course.code}: ${course.name}. TAs work remotely and support instructors and students under the supervision of the Online TA Management Team.`} rows="3" className="mt-2 w-full rounded-md border border-slate-300 p-2 normal-case"/></label><label className="mt-3 block text-xs uppercase">Supplementary training<textarea rows="3" className="mt-2 w-full rounded-md border border-slate-300 p-2"/></label><label className="mt-3 block text-xs uppercase">Setup instructions<textarea rows="3" className="mt-2 w-full rounded-md border border-slate-300 p-2"/></label><label className="mt-3 block text-xs uppercase">Required certifications<input className="mt-2 h-10 w-full rounded-md border border-slate-300 px-2"/></label>
-        <div className="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4"><button onClick={() => {setSaved(true); setTimeout(() => setSaved(false), 1800)}} className="rounded-md bg-sky-600 px-4 py-2 font-semibold text-white">{saved ? 'Saved' : 'Save'}</button><button className="rounded-md border border-sky-600 px-4 py-2 font-semibold text-sky-700">Submit for approval</button><button className="ml-auto font-semibold text-sky-700">History</button></div>
+        <h3 className="mb-2 mt-5 text-xs font-bold uppercase">Details</h3>
+        <label className="block text-xs uppercase">Position requirements<textarea value={plan.positionRequirements} onChange={e => updatePlan('positionRequirements', e.target.value)} rows="3" className="mt-2 w-full rounded-md border border-slate-300 p-2 normal-case outline-none focus:border-sky-500"/></label>
+        <label className="mt-3 block text-xs uppercase">Job description<textarea value={plan.jobDescription} onChange={e => updatePlan('jobDescription', e.target.value)} rows="5" className="mt-2 w-full rounded-md border border-slate-300 p-2 normal-case outline-none focus:border-sky-500"/></label>
+        <label className="mt-3 block text-xs uppercase">Job duties<textarea value={plan.jobDuties} onChange={e => updatePlan('jobDuties', e.target.value)} rows="3" className="mt-2 w-full rounded-md border border-slate-300 p-2 normal-case outline-none focus:border-sky-500"/></label>
+        <label className="mt-3 block text-xs uppercase">Job expectations<textarea value={plan.jobExpectations} onChange={e => updatePlan('jobExpectations', e.target.value)} rows="7" className="mt-2 w-full rounded-md border border-slate-300 p-2 normal-case outline-none focus:border-sky-500"/></label>
+        <fieldset className="mt-3 border-0 p-0"><legend className="text-xs uppercase">Supplemental training and/or required certificate</legend><label className="mt-2 block max-w-xs text-xs text-slate-700">Requires certification<select value={plan.requiresCertification} onChange={e => updatePlan('requiresCertification', e.target.value)} className="mt-1 block h-10 w-full rounded-md border border-slate-300 bg-white px-2 text-sm outline-none focus:border-sky-500"><option>No</option><option>Yes</option></select></label>{plan.requiresCertification === 'Yes' && <label className="mt-3 block text-xs uppercase">Certification / training description<textarea value={plan.certificationDescription} onChange={e => updatePlan('certificationDescription', e.target.value)} rows="3" className="mt-2 w-full rounded-md border border-slate-300 p-2 normal-case outline-none focus:border-sky-500" placeholder="Describe required certification, supplemental training, or course-specific details."/></label>}</fieldset>
+        <div className="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4"><button onClick={persistPlan} className="rounded-md bg-sky-600 px-4 py-2 font-semibold text-white">{saved ? 'Saved' : 'Save'}</button><button onClick={persistPlan} className="rounded-md border border-sky-600 px-4 py-2 font-semibold text-sky-700">Submit for approval</button><button className="ml-auto font-semibold text-sky-700">History</button></div>
       </section>
       <section className={`${card} mt-4`}><h2 className="mb-4 text-xs font-bold uppercase">Sections this term</h2><p>No sections this term.</p></section>
     </div>
